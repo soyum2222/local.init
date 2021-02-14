@@ -1,0 +1,7 @@
+
+:set clipboard=unnamed
+:set number
+
+call plug#begin()
+call plug#end()
+
