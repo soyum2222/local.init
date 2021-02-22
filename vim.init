@@ -2,6 +2,15 @@
 :set clipboard=unnamed
 :set number
 
+
+
+
+noremap <F2> :NERDTreeToggle<CR>
+noremap n :tabnew<CR>
+noremap [ :tabp<CR>
+noremap ] :tabn<CR>
+
 call plug#begin()
+  Plug 'preservim/nerdtree'
 call plug#end()
 
