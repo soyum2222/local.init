@@ -17,10 +17,17 @@ fi
 # zsh
 sudo apt install zsh
 chsh -s /bin/zsh
-git clone git://github.com/robbyrussell/oh-my-zsh.git ~/.oh-my-zsh
+
+if [! -d "$HOME/.oh-my-zsh" ];then
+	git clone git://github.com/robbyrussell/oh-my-zsh.git ~/.oh-my-zsh
+fi
+cp .zshrc ~
 
 
 # zlua
 sudo apt install lua5.3
-sudo git clone https://github.com/skywind3000/z.lua /opt/z.lua
+
+if [! -d "/opt/z.lua" ];then
+	sudo git clone https://github.com/skywind3000/z.lua /opt/z.lua
+fi
 
