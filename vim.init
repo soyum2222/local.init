@@ -11,6 +11,19 @@ noremap n :tabnew<CR>
 noremap - :tabp<CR>
 noremap = :tabn<CR>
 
+if &term =~ "xterm"
+	let &t_SI = "\<Esc>[6 q"
+	let &t_SR = "\<Esc>[3 q"
+	let &t_EI = "\<Esc>[2 q"
+endif
+
+if exists('$TMUX')
+	let &t_SI .= "\e[6 q"
+	let &t_SR .= "\e[3 q"
+	let &t_EI .= "\e[2 q"
+endif
+
+
 call plug#begin()
   Plug 'preservim/nerdtree'
 call plug#end()
