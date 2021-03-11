@@ -21,7 +21,16 @@ chsh -s /bin/zsh
 if [ ! -d "$HOME/.oh-my-zsh" ];then
 	git clone git://github.com/robbyrussell/oh-my-zsh.git ~/.oh-my-zsh
 fi
-cp .zshrc ~
+
+if [ ! -d "$HOME/.zshrc"];then
+	mv $HOME/.zshrc $HOME/.zshrc.backup
+	echo "source $WORKPATH/.zshrc" >> $HOME/.zshrc 
+else
+	echo "source $WORKPATH/.zshrc" >> $HOME/.zshrc 
+fi
+
+# zsh plug
+
 
 
 # zlua
