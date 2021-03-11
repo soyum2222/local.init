@@ -1,7 +1,7 @@
 #/bin/bash
 
 WORKPATH=$(pwd)
-
+OHMYZSH_HOME=$HOME/.oh-my-zsh
 # vim 
 if [ -f "$HOME/.vimrc" ];then
 	mv $HOME/.vimrc $HOME/.vimrc.backup
@@ -18,19 +18,22 @@ fi
 sudo apt install zsh
 chsh -s /bin/zsh
 
-if [ ! -d "$HOME/.oh-my-zsh" ];then
-	git clone git://github.com/robbyrussell/oh-my-zsh.git ~/.oh-my-zsh
+if [ ! -d "$OHMYZSH_HOME" ];then
+	git clone https://github.com/ohmyzsh/ohmyzsh.git ~/.oh-my-zsh
 fi
 
-if [ ! -d "$HOME/.zshrc"];then
+if [ -f "$HOME/.zshrc" ];then
 	mv $HOME/.zshrc $HOME/.zshrc.backup
 	echo "source $WORKPATH/.zshrc" >> $HOME/.zshrc 
 else
 	echo "source $WORKPATH/.zshrc" >> $HOME/.zshrc 
 fi
 
-# zsh plug
 
+# zsh plug
+if [ ! -d "$OHMYZSH_HOME/plugins/zsh-autosuggestions" ]; then
+	git clone --depth=1 https://github.com/zsh-users/zsh-autosuggestions $OHMYZSH_HOME/plugins/zsh-autosuggestions
+fi
 
 
 # zlua

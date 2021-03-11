@@ -74,6 +74,7 @@ ZSH_THEME="bira"
 plugins=(
 	extract
 	git
+	zsh-autosuggestions
 )
 
 
