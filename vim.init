@@ -1,7 +1,11 @@
-:set clipboard=unnamed
-:set number
+set clipboard=unnamed
+set relativenumber
+set number
+
 
 noremap <F2> :NERDTreeToggle<CR>
+noremap <F3> :Autoformat<CR>
+
 
 noremap <A-n> :tabnew<CR>
 noremap <A--> :tabp<CR>
@@ -27,9 +31,12 @@ endif
 let g:db_ui_table_helpers = {'mysql': {'Count': 'select count(*) from {table}'}}
 let g:db_ui_auto_execute_table_helpers = 1
 
+
+
 call plug#begin()
   Plug 'preservim/nerdtree'
   Plug 'tpope/vim-dadbod'
   Plug 'kristijanhusak/vim-dadbod-ui'
+  Plug 'dense-analysis/ale'
 call plug#end()
 
