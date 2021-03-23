@@ -37,10 +37,6 @@ fi
 
 # exoprt
 
-sudo echo "export GOROOT=/opt/go" >> /etc/profile
-sudo echo "export PATH=$PATH:$GOROOT/bin:$GOPATH/bin" >> /etc/profile
-
-
 # zlua
 sudo apt install lua5.3
 

@@ -109,3 +109,7 @@ source $ZSH/oh-my-zsh.sh
 set nonomatch 
 eval "$(lua /opt/z.lua/z.lua --init zsh)"
 setopt no_nomatch
+
+
+export GOROOT=/opt/go
+export PATH=$PATH:$GOROOT/bin:$GOPATH/bin
