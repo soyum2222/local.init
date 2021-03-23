@@ -35,6 +35,11 @@ if [ ! -d "$OHMYZSH_HOME/plugins/zsh-autosuggestions" ]; then
 	git clone --depth=1 https://github.com/zsh-users/zsh-autosuggestions $OHMYZSH_HOME/plugins/zsh-autosuggestions
 fi
 
+# exoprt
+
+sudo echo "export GOROOT=/opt/go" >> /etc/profile
+sudo echo "export PATH=$PATH:$GOROOT/bin:$GOPATH/bin" >> /etc/profile
+
 
 # zlua
 sudo apt install lua5.3
