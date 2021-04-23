@@ -79,6 +79,7 @@ plugins=(
 
 
 source $ZSH/oh-my-zsh.sh
+source /etc/zsh_command_not_found
 
 # User configuration
 
@@ -109,6 +110,8 @@ source $ZSH/oh-my-zsh.sh
 set nonomatch 
 eval "$(lua /opt/z.lua/z.lua --init zsh)"
 setopt no_nomatch
+
+
 
 
 export GOROOT=/opt/go
