@@ -19,7 +19,7 @@ sudo apt install zsh
 chsh -s /bin/zsh
 
 if [ ! -d "$OHMYZSH_HOME" ];then
-	git clone https://github.com/ohmyzsh/ohmyzsh.git ~/.oh-my-zsh
+	git clone --depth=1 git@github.com:ohmyzsh/ohmyzsh.git ~/.oh-my-zsh
 fi
 
 if [ -f "$HOME/.zshrc" ];then
@@ -32,7 +32,7 @@ fi
 
 # zsh plug
 if [ ! -d "$OHMYZSH_HOME/plugins/zsh-autosuggestions" ]; then
-	git clone --depth=1 https://github.com/zsh-users/zsh-autosuggestions $OHMYZSH_HOME/plugins/zsh-autosuggestions
+	git clone --depth=1 git@github.com:zsh-users/zsh-autosuggestions.git $OHMYZSH_HOME/plugins/zsh-autosuggestions
 fi
 
 # exoprt
@@ -41,6 +41,6 @@ fi
 sudo apt install lua5.3
 
 if [ ! -d "/opt/z.lua" ];then
-	sudo git clone https://github.com/skywind3000/z.lua /opt/z.lua
+	sudo git clone --depth=1 git@github.com:skywind3000/z.lua.git /opt/z.lua
 fi
 
