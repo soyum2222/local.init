@@ -1,6 +1,7 @@
 set clipboard=unnamed
 set relativenumber
 set number
+set incsearch
 
 
 noremap <F2> :NERDTreeToggle<CR>
@@ -30,8 +31,6 @@ endif
 " DBUI setting
 let g:db_ui_table_helpers = {'mysql': {'Count': 'select count(*) from {table}'}}
 let g:db_ui_auto_execute_table_helpers = 1
-
-
 
 call plug#begin()
   Plug 'preservim/nerdtree'
