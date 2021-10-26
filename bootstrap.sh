@@ -11,7 +11,7 @@ else
 fi
 
 if [ ! -f "$HOME/.vim/autoload/plug.vim" ]; then
-	curl -fLo ~/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+	cp $WORKPATH/plug.vim ~/.vim/autoload/plug.vim
 fi
 
 # zsh
@@ -44,3 +44,14 @@ if [ ! -d "/opt/z.lua" ];then
 	sudo git clone --depth=1 git@github.com:skywind3000/z.lua.git /opt/z.lua
 fi
 
+# tmux
+if [ ! -d "/etc/tmux.conf"];then
+	cp $WORKPATH/tmux.conf /etc/tmux.conf
+	cat $WORKPATH/tmux.conf >> 
+fi
+
+# download golang
+if [ ! -d "/opt/go" ];then
+	sudo wget https://studygolang.com/dl/golang/go1.17.2.linux-amd64.tar.gz -o /opt/golang.gz
+	tar -zxvf golang.gz -C /opt
+fi
