@@ -11,6 +11,7 @@ else
 fi
 
 if [ ! -f "$HOME/.vim/autoload/plug.vim" ]; then
+	mkdir -p ~/.vim/autoload/
 	cp $WORKPATH/plug.vim ~/.vim/autoload/plug.vim
 fi
 
@@ -29,7 +30,6 @@ else
 	echo "source $WORKPATH/.zshrc" >> $HOME/.zshrc 
 fi
 
-
 # zsh plug
 if [ ! -d "$OHMYZSH_HOME/plugins/zsh-autosuggestions" ]; then
 	git clone --depth=1 git@github.com:zsh-users/zsh-autosuggestions.git $OHMYZSH_HOME/plugins/zsh-autosuggestions
@@ -45,9 +45,10 @@ if [ ! -d "/opt/z.lua" ];then
 fi
 
 # tmux
-if [ ! -d "/etc/tmux.conf"];then
+if [ ! -d "/etc/tmux.conf" ];then
 	cp $WORKPATH/tmux.conf /etc/tmux.conf
-	cat $WORKPATH/tmux.conf >> 
+else
+	cat $WORKPATH/tmux.conf >> /etc/tmux.conf 
 fi
 
 # download golang
