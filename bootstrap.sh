@@ -2,6 +2,9 @@
 
 WORKPATH=$(pwd)
 OHMYZSH_HOME=$HOME/.oh-my-zsh
+
+sudo add-apt-repository ppa:neovim-ppa/unstable
+
 # vim 
 if [ -f "$HOME/.vimrc" ];then
 	mv $HOME/.vimrc $HOME/.vimrc.backup
