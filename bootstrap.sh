@@ -3,10 +3,10 @@
 WORKPATH=$(pwd)
 OHMYZSH_HOME=$HOME/.oh-my-zsh
 
-apt remove vim
+apt  remove vim
 add-apt-repository ppa:neovim-ppa/unstable
 apt update
-apt install neovim
+apt install -y neovim
 
 # vim 
 VIMINIT_PATH=$HOME/.config/nvim
@@ -15,6 +15,7 @@ if [ -f "$VIMINIT_PATH/$VIMINIT_FILE" ];then
 	mv $VIMINIT_PATH/$VIMINIT_FILE $VIMINIT_PATH/$VIMINIT_FILE.backup
 	echo ":source $WORKPATH/init.vim" >> $VIMINIT_PATH/$VIMINIT_FILE 
 else
+	mkdir -p $VIMINIT_PATH
 	echo ":source $WORKPATH/init.vim" >> $VIMINIT_PATH/$VIMINIT_FILE 
 fi
 
@@ -27,7 +28,7 @@ if [ ! -f "$PLUG_PATH/$PLUG_FILE" ]; then
 fi
 
 # zsh
-apt install zsh
+apt install -y zsh
 chsh -s /bin/zsh
 
 if [ ! -d "$OHMYZSH_HOME" ];then
@@ -49,7 +50,7 @@ fi
 # exoprt
 
 # zlua
-apt install lua5.3
+apt install -y lua5.3
 
 if [ ! -d "/opt/z.lua" ];then
 	git clone --depth=1 https://github.com/skywind3000/z.lua.git /opt/z.lua
