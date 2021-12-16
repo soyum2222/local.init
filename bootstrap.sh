@@ -3,23 +3,31 @@
 WORKPATH=$(pwd)
 OHMYZSH_HOME=$HOME/.oh-my-zsh
 
-sudo add-apt-repository ppa:neovim-ppa/unstable
+apt remove vim
+add-apt-repository ppa:neovim-ppa/unstable
+apt update
+apt install neovim
 
 # vim 
-if [ -f "$HOME/.vimrc" ];then
-	mv $HOME/.vimrc $HOME/.vimrc.backup
-	echo ":source $WORKPATH/vim.init" >> $HOME/.vimrc 
+VIMINIT_PATH=$HOME/.config/nvim
+VIMINIT_FILE=init.vim
+if [ -f "$VIMINIT_PATH/$VIMINIT_FILE" ];then
+	mv $VIMINIT_PATH/$VIMINIT_FILE $VIMINIT_PATH/$VIMINIT_FILE.backup
+	echo ":source $WORKPATH/init.vim" >> $VIMINIT_PATH/$VIMINIT_FILE 
 else
-	echo ":source $WORKPATH/vim.init" >> $HOME/.vimrc 
+	echo ":source $WORKPATH/init.vim" >> $VIMINIT_PATH/$VIMINIT_FILE 
 fi
 
-if [ ! -f "$HOME/.vim/autoload/plug.vim" ]; then
-	mkdir -p ~/.vim/autoload/
-	cp $WORKPATH/plug.vim ~/.vim/autoload/plug.vim
+# vim-plug
+PLUG_PATH=${XDG_DATA_HOME:-$HOME/.local/share}/nvim/site/autoload
+PLUG_FILE=plug.vim
+if [ ! -f "$PLUG_PATH/$PLUG_FILE" ]; then
+	mkdir -p $PLUG_PATH
+	cp $WORKPATH/plug.vim $PLUG_PATH/$PLUG_FILE
 fi
 
 # zsh
-sudo apt install zsh
+apt install zsh
 chsh -s /bin/zsh
 
 if [ ! -d "$OHMYZSH_HOME" ];then
@@ -41,21 +49,21 @@ fi
 # exoprt
 
 # zlua
-sudo apt install lua5.3
+apt install lua5.3
 
 if [ ! -d "/opt/z.lua" ];then
-	sudo git clone --depth=1 https://github.com/skywind3000/z.lua.git /opt/z.lua
+	git clone --depth=1 https://github.com/skywind3000/z.lua.git /opt/z.lua
 fi
 
 # tmux
 if [ ! -d "/etc/tmux.conf" ];then
-	sudo cp $WORKPATH/tmux.conf /etc/tmux.conf
+	cp $WORKPATH/tmux.conf /etc/tmux.conf
 else
-	sudo cat $WORKPATH/tmux.conf >> /etc/tmux.conf 
+	cat $WORKPATH/tmux.conf >> /etc/tmux.conf 
 fi
 
 # download golang
 if [ ! -d "/opt/go" ];then
-	sudo wget https://studygolang.com/dl/golang/go1.17.2.linux-amd64.tar.gz -o /opt/golang.gz
+	wget https://studygolang.com/dl/golang/go1.17.2.linux-amd64.tar.gz -o /opt/golang.gz
 	tar -zxvf golang.gz -C /opt
 fi
