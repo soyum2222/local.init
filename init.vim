@@ -3,10 +3,8 @@ set relativenumber
 set number
 set incsearch
 
-
 noremap <F2> :NERDTreeToggle<CR>
 noremap <F3> :Autoformat<CR>
-
 
 noremap <A-n> :tabnew<CR>
 noremap <A--> :tabp<CR>
@@ -46,6 +44,9 @@ Plug 'hrsh7th/cmp-buffer'
 Plug 'hrsh7th/cmp-path'
 Plug 'hrsh7th/cmp-cmdline'
 Plug 'hrsh7th/nvim-cmp'
+Plug 'Pocco81/AutoSave.nvim'
+Plug 'dracula/vim', { 'as': 'dracula' }
+Plug 'tpope/vim-fugitive'
 
 " For vsnip users.
 Plug 'hrsh7th/cmp-vsnip'
@@ -55,6 +56,10 @@ Plug 'L3MON4D3/LuaSnip'
 Plug 'nvim-telescope/telescope.nvim'
 Plug 'nvim-lua/plenary.nvim'
 call plug#end()
+
+" scheme
+"
+colorscheme dracula
 
 " By default, it will be triggered by `ENTER` in insert mode.
 " set this to 1 to use `CTRL+ENTER` instead, and keep the  
@@ -69,6 +74,27 @@ set completeopt=menu,menuone,noselect
 
 
 lua << EOF
+
+
+-- autosave
+local autosave = require("autosave")
+autosave.setup(
+    {
+        enabled = true,
+        execution_message = "AutoSave: saved at " .. vim.fn.strftime("%H:%M:%S"),
+        events = {"InsertLeave", "TextChanged"},
+        conditions = {
+            exists = true,
+            filename_is_not = {},
+            filetype_is_not = {},
+            modifiable = true
+        },
+        write_all_buffers = false,
+        on_off_commands = true,
+        clean_command_line_interval = 0,
+        debounce_delay = 135
+    }
+)
 
 -- Setup nvim-cmp.
 local cmp = require'cmp'
@@ -169,12 +195,7 @@ end
 	  capabilities = capabilities
 	  }
 
-  require('lspconfig')['pylsp'].setup {
-	  capabilities = capabilities
-	  }
-
-  require('lspconfig').pylsp.setup { cmd = { "/home/soyum2222/.local/share/nvim/lsp_servers/pylsp/venv/bin/pylsp" } }
-  require('lspconfig').gopls.setup { cmd = { "/home/soyum2222/.local/share/nvim/lsp_servers/go/gopls" } }
+  require('lspconfig').gopls.setup { cmd = { "~/.local/share/nvim/lsp_servers/go/gopls" } }
 
 
   -- config that activates keymaps and enables snippet support
@@ -199,7 +220,7 @@ lsp_installer.on_server_ready(function(server)
 local config = make_config()
 
 -- language specific config
-if server.name == "gopls" and server.name == "pylsp" then
+if server.name == "gopls" then
 	config.settings = {
 		experimentalPostfixCompletions = true,
 		experimentalWorkspaceModule = false,
