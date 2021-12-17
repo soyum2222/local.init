@@ -84,6 +84,9 @@ let g:rtf_on_insert_leave = 1
 
 set completeopt=menu,menuone,noselect
 
+" customize command
+command! GitDiff GitGutterQuickFix | copen
+
 
 lua << EOF
 
