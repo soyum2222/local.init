@@ -34,19 +34,32 @@ call plug#begin()
 Plug 'preservim/nerdtree'
 Plug 'tpope/vim-dadbod'
 Plug 'kristijanhusak/vim-dadbod-ui'
-Plug 'dense-analysis/ale'
-Plug 'skywind3000/vim-rt-format', { 'do': 'pip3 install autopep8' }
 Plug 'neovim/nvim-lspconfig'
 Plug 'williamboman/nvim-lsp-installer'
 Plug 'neovim/nvim-lspconfig'
+
+" hint
+Plug 'dense-analysis/ale'
+
+" auto hint
+Plug 'hrsh7th/nvim-cmp'
 Plug 'hrsh7th/cmp-nvim-lsp'
 Plug 'hrsh7th/cmp-buffer'
 Plug 'hrsh7th/cmp-path'
 Plug 'hrsh7th/cmp-cmdline'
-Plug 'hrsh7th/nvim-cmp'
+
+" auto save
 Plug 'Pocco81/AutoSave.nvim'
+
+" clorscheme
 Plug 'dracula/vim', { 'as': 'dracula' }
+
+" git plug
 Plug 'tpope/vim-fugitive'
+Plug 'airblade/vim-gitgutter'
+
+" function signature hint
+Plug 'ray-x/lsp_signature.nvim'
 
 " For vsnip users.
 Plug 'hrsh7th/cmp-vsnip'
@@ -58,7 +71,6 @@ Plug 'nvim-lua/plenary.nvim'
 call plug#end()
 
 " scheme
-"
 colorscheme dracula
 
 " By default, it will be triggered by `ENTER` in insert mode.
@@ -142,19 +154,20 @@ end,
 	  })
 
   -- Use cmdline & path source for ':' (if you enabled `native_menu`, this won't work anymore).
-  cmp.setup.cmdline(':', {
-	  sources = cmp.config.sources({
-	  { name = 'path' }
-	  }, {
-	  { name = 'cmdline' }
-	  })
-  })
+  -- cmp.setup.cmdline(':', {
+  --         sources = cmp.config.sources({
+  --         { name = 'path' }
+  --         }, {
+  --         { name = 'cmdline' }
+  --         })
+  -- })
 
 
 
 -- LSP settings
 local nvim_lsp = require 'lspconfig'
 local on_attach = function(_, bufnr)
+	require "lsp_signature".on_attach() 
 
 	vim.api.nvim_buf_set_option(bufnr, 'omnifunc', 'v:lua.vim.lsp.omnifunc')
 
@@ -177,7 +190,8 @@ local on_attach = function(_, bufnr)
 	
 	vim.api.nvim_buf_set_keymap(bufnr, 'n', ']d', '<cmd>lua vim.lsp.diagnostic.goto_next()<CR>', opts)
 	--vim.api.nvim_buf_set_keymap(bufnr, 'n', '<leader>q', '<cmd>lua vim.lsp.diagnostic.set_loclist()<CR>', opts)
-	vim.cmd [[ command! Format execute 'lua vim.lsp.buf.formatting()' ]]
+	vim.api.nvim_buf_set_keymap(bufnr,'n','<C-s>','<cmd>lua vim.lsp.buf.formatting()<CR>',opts)
+	-- vim.cmd [[ command! Format execute 'lua vim.lsp.buf.formatting()' ]]
 
 	vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gd', '<Cmd>lua require(\'telescope.builtin\').lsp_definitions(require(\'telescope.themes\').get_ivy({}))<CR>', opts)
 	vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gi', '<cmd>lua require(\'telescope.builtin\').lsp_implementations(require(\'telescope.themes\').get_ivy({}))<CR>', opts)
