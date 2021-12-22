@@ -4,22 +4,46 @@ set number
 set incsearch
 
 noremap <F2> :NERDTreeToggle<CR>
-noremap <F3> :Autoformat<CR>
+noremap <F8> :lua require'dap'.step_over()<CR>
+noremap <F9> :lua require'dap'.step_into()<CR>
+
 
 noremap <A-n> :tabnew<CR>
 noremap <A--> :tabp<CR>
 noremap <A-=> :tabn<CR>
+noremap <A-b> :lua require'dap'.toggle_breakpoint()<CR>
+noremap <A-c> :lua require'dap'.continue()<CR>
+noremap <A-s> :lua require('dap.ui.widgets').hover()<CR>
+noremap <A-w> :lua local widgets =  require('dap.ui.widgets'); widgets.centered_float(widgets.scopes)<CR>
 
+
+" compatible windows terminal
 noremap n :tabnew<CR>
 noremap - :tabp<CR>
 noremap = :tabn<CR>
+noremap b :lua require'dap'.toggle_breakpoint()<CR>
+noremap c :lua require'dap'.continue()<CR>
+noremap s :lua require('dap.ui.widgets').hover()<CR>
+noremap w :lua require('dap.ui.widgets').centered_float(widgets.scopes)<CR>
 
+
+command DebugW lua local widgets = require('dap.ui.widgets');local my_sidebar = widgets.sidebar(widgets.scopes);my_sidebar.open();local widgets = require('dap.ui.widgets');local my_sidebar = widgets.sidebar(widgets.frames);my_sidebar.open();
+
+function GoDebug()
+	copen
+	AsyncRun dlv dap -l 127.0.0.1:38697 --log --log-output="dap" "$(VIM_FILEPATH)" 
+endfunction
+
+
+" compatible windows terminal
 if &term =~ "xterm"
 	let &t_SI = "\<Esc>[6 q"
 	let &t_SR = "\<Esc>[3 q"
 	let &t_EI = "\<Esc>[2 q"
 endif
 
+
+" compatible windows terminal
 if exists('$TMUX')
 	let &t_SI .= "\e[6 q"
 	let &t_SR .= "\e[3 q"
@@ -58,8 +82,18 @@ Plug 'dracula/vim', { 'as': 'dracula' }
 Plug 'tpope/vim-fugitive'
 Plug 'airblade/vim-gitgutter'
 
+" async run
+Plug 'skywind3000/asyncrun.vim'
+
 " function signature hint
 Plug 'ray-x/lsp_signature.nvim'
+
+" dap
+Plug 'mfussenegger/nvim-dap'
+" Plug 'leoluz/nvim-dap-go'
+
+" tree sitter
+" Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}  " We recommend updating the parsers on update
 
 " For vsnip users.
 Plug 'hrsh7th/cmp-vsnip'
@@ -89,6 +123,37 @@ command! GitDiff GitGutterQuickFix | copen
 
 
 lua << EOF
+
+-- require('dap-go').setup()
+dap = require('dap')
+dap.adapters.go = {
+    type = "server",
+    host = "127.0.0.1",
+    port = 38697,
+}
+dap.configurations.go = {
+    {
+      type = "go",
+      name = "Debug",
+      request = "launch",
+      program = "${file}"
+    },
+    {
+      type = "go",
+      name = "Debug test", -- configuration for debugging test files
+      request = "launch",
+      mode = "test",
+      program = "${file}"
+    },
+    -- works with go.mod packages and sub packages 
+    {
+      type = "go",
+      name = "Debug test (go.mod)",
+      request = "launch",
+      mode = "test",
+      program = "./${relativeFileDirname}"
+    } 
+}
 
 
 -- autosave
@@ -242,6 +307,10 @@ if server.name == "gopls" then
 		experimentalPostfixCompletions = true,
 		experimentalWorkspaceModule = false,
 		}
+
+	-- golang 
+	vim.api.nvim_command('command DebugRun call GoDebug()')
+	
 end
 -- (optional) Customize the options passed to the server
 -- if server.name == "tsserver" then

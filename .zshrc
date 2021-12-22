@@ -115,4 +115,4 @@ setopt no_nomatch
 
 export GOROOT=/opt/go
 export GOPATH=~/go
-export PATH=$PATH:$GOROOT/bin:$GOPATH/bin
+export PATH=$PATH:$GOROOT/bin:$GOPATH/bin:~/.local/bin
