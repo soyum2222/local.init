@@ -77,10 +77,13 @@ Plug 'Pocco81/AutoSave.nvim'
 
 " clorscheme
 Plug 'dracula/vim', { 'as': 'dracula' }
+Plug 'sainnhe/sonokai'
 
 " git plug
 Plug 'tpope/vim-fugitive'
-Plug 'airblade/vim-gitgutter'
+" Plug 'airblade/vim-gitgutter'
+Plug 'nvim-lua/plenary.nvim'
+Plug 'lewis6991/gitsigns.nvim'
 
 " async run
 Plug 'skywind3000/asyncrun.vim'
@@ -105,7 +108,17 @@ Plug 'nvim-lua/plenary.nvim'
 call plug#end()
 
 " scheme
-colorscheme dracula
+" colorscheme dracula
+" Important!!
+if has('termguicolors')
+	set termguicolors
+endif
+" the configuration options should be placed before `colorscheme sonokai`.
+let g:sonokai_style = 'andromeda'
+let g:sonokai_enable_italic = 1
+let g:sonokai_disable_italic_comment = 1
+let g:airline_theme = 'sonokai'
+colorscheme sonokai
 
 " By default, it will be triggered by `ENTER` in insert mode.
 " set this to 1 to use `CTRL+ENTER` instead, and keep the  
@@ -119,61 +132,127 @@ let g:rtf_on_insert_leave = 1
 set completeopt=menu,menuone,noselect
 
 " customize command
-command! GitDiff GitGutterQuickFix | copen
+command! GitDiff Gitsigns diffthis
 
 
 lua << EOF
 
+
+-- Gitsigns
+require('gitsigns').setup {
+	signs = {
+		add = { hl = 'GitGutterAdd', text = '+' },
+		change = { hl = 'GitGutterChange', text = '~' },
+		delete = { hl = 'GitGutterDelete', text = '_' },
+		topdelete = { hl = 'GitGutterDelete', text = '‾' },
+		changedelete = { hl = 'GitGutterChange', text = '~' },
+		},
+	keymaps = {
+		-- Default keymap options
+		noremap = true,
+
+		['n ]h'] = { expr = true, "&diff ? ']c' : '<cmd>lua require\"gitsigns.actions\".next_hunk()<CR>'"},
+		['n [h'] = { expr = true, "&diff ? '[c' : '<cmd>lua require\"gitsigns.actions\".prev_hunk()<CR>'"},
+
+		['n <leader>hs'] = '<cmd>lua require"gitsigns".stage_hunk()<CR>',
+		['v <leader>hs'] = '<cmd>lua require"gitsigns".stage_hunk({vim.fn.line("."), vim.fn.line("v")})<CR>',
+		['n <leader>hu'] = '<cmd>lua require"gitsigns".undo_stage_hunk()<CR>',
+		['n <leader>hr'] = '<cmd>lua require"gitsigns".reset_hunk()<CR>',
+		['v <leader>hr'] = '<cmd>lua require"gitsigns".reset_hunk({vim.fn.line("."), vim.fn.line("v")})<CR>',
+		--['n <leader>hR'] = '<cmd>lua require"gitsigns".reset_buffer()<CR>',
+		--['n <leader>hp'] = '<cmd>lua require"gitsigns".preview_hunk()<CR>',
+		['n <leader>hb'] = '<cmd>lua require"gitsigns".blame_line(true)<CR>',
+		--['n <leader>hS'] = '<cmd>lua require"gitsigns".stage_buffer()<CR>',
+		--['n <leader>hU'] = '<cmd>lua require"gitsigns".reset_buffer_index()<CR>',
+
+		-- Text objects
+		['o ih'] = ':<C-U>lua require"gitsigns.actions".select_hunk()<CR>',
+		['x ih'] = ':<C-U>lua require"gitsigns.actions".select_hunk()<CR>'
+		},
+	watch_gitdir = {
+		interval = 1000,
+		follow_files = true
+		},
+	attach_to_untracked = true,
+	current_line_blame = true, -- Toggle with `:Gitsigns toggle_current_line_blame`
+	current_line_blame_opts = {
+		virt_text = true,
+		virt_text_pos = 'eol', -- 'eol' | 'overlay' | 'right_align'
+		delay = 100,
+		ignore_whitespace = false,
+		},
+	current_line_blame_formatter_opts = {
+		relative_time = true
+		},
+	sign_priority = 6,
+	update_debounce = 100,
+	status_formatter = nil, -- Use default
+	max_file_length = 40000,
+	preview_config = {
+		-- Options passed to nvim_open_win
+		border = 'single',
+		style = 'minimal',
+		relative = 'cursor',
+		row = 0,
+		col = 1
+		},
+	yadm = {
+	enable = false
+	},
+	linehl = true
+}
+
+
 -- require('dap-go').setup()
 dap = require('dap')
 dap.adapters.go = {
-    type = "server",
-    host = "127.0.0.1",
-    port = 38697,
-}
+	type = "server",
+	host = "127.0.0.1",
+	port = 38697,
+	}
 dap.configurations.go = {
-    {
-      type = "go",
-      name = "Debug",
-      request = "launch",
-      program = "${file}"
-    },
-    {
-      type = "go",
-      name = "Debug test", -- configuration for debugging test files
-      request = "launch",
-      mode = "test",
-      program = "${file}"
-    },
-    -- works with go.mod packages and sub packages 
-    {
-      type = "go",
-      name = "Debug test (go.mod)",
-      request = "launch",
-      mode = "test",
-      program = "./${relativeFileDirname}"
-    } 
+	{
+			type = "go",
+			name = "Debug",
+			request = "launch",
+			program = "${file}"
+	},
+	{
+			type = "go",
+			name = "Debug test", -- configuration for debugging test files
+			request = "launch",
+			mode = "test",
+			program = "${file}"
+	},
+	-- works with go.mod packages and sub packages 
+	{
+			type = "go",
+			name = "Debug test (go.mod)",
+			request = "launch",
+			mode = "test",
+			program = "./${relativeFileDirname}"
+	} 
 }
 
 
 -- autosave
 local autosave = require("autosave")
 autosave.setup(
-    {
-        enabled = true,
-        execution_message = "AutoSave: saved at " .. vim.fn.strftime("%H:%M:%S"),
-        events = {"InsertLeave", "TextChanged"},
-        conditions = {
-            exists = true,
-            filename_is_not = {},
-            filetype_is_not = {},
-            modifiable = true
-        },
-        write_all_buffers = false,
-        on_off_commands = true,
-        clean_command_line_interval = 0,
-        debounce_delay = 135
-    }
+{
+enabled = true,
+execution_message = "AutoSave: saved at " .. vim.fn.strftime("%H:%M:%S"),
+events = {"InsertLeave", "TextChanged"},
+conditions = {
+	exists = true,
+	filename_is_not = {},
+	filetype_is_not = {},
+	modifiable = true
+	},
+write_all_buffers = false,
+on_off_commands = true,
+clean_command_line_interval = 0,
+debounce_delay = 135
+}
 )
 
 -- Setup nvim-cmp.
@@ -232,64 +311,66 @@ end,
 
 
 
--- LSP settings
-local nvim_lsp = require 'lspconfig'
-local on_attach = function(_, bufnr)
-	require "lsp_signature".on_attach() 
+  -- LSP settings
+  local nvim_lsp = require 'lspconfig'
+  local on_attach = function(_, bufnr)
+  require "lsp_signature".on_attach() 
 
-	vim.api.nvim_buf_set_option(bufnr, 'omnifunc', 'v:lua.vim.lsp.omnifunc')
+  vim.api.nvim_buf_set_option(bufnr, 'omnifunc', 'v:lua.vim.lsp.omnifunc')
 
-	local opts = { noremap = true, silent = true }
-	vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gD', '<Cmd>lua vim.lsp.buf.declaration()<CR>', opts)
-	vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gd', '<Cmd>lua vim.lsp.buf.definition()<CR>', opts)
-	vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gi', '<cmd>lua vim.lsp.buf.implementation()<CR>', opts)
-	vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gr', '<cmd>lua vim.lsp.buf.references()<CR>', opts)
-	vim.api.nvim_buf_set_keymap(bufnr, 'n', 'K', '<Cmd>lua vim.lsp.buf.hover()<CR>', opts)
-	--vim.api.nvim_buf_set_keymap(bufnr, 'n', '<C-k>', '<cmd>lua vim.lsp.buf.signature_help()<CR>', opts)
-	--vim.api.nvim_buf_set_keymap(bufnr, 'n', '<leader>wa', '<cmd>lua vim.lsp.buf.add_workspace_folder()<CR>', opts)
-	--vim.api.nvim_buf_set_keymap(bufnr, 'n', '<leader>wr', '<cmd>lua vim.lsp.buf.remove_workspace_folder()<CR>', opts)
-	--vim.api.nvim_buf_set_keymap(bufnr, 'n', '<leader>wl', '<cmd>lua print(vim.inspect(vim.lsp.buf.list_workspace_folders()))<CR>', opts)
-	--vim.api.nvim_buf_set_keymap(bufnr, 'n', '<leader>D', '<cmd>lua vim.lsp.buf.type_definition()<CR>', opts)
-	vim.api.nvim_buf_set_keymap(bufnr, 'n', '<leader>rn', '<cmd>lua vim.lsp.buf.rename()<CR>', opts)
-	vim.api.nvim_buf_set_keymap(bufnr, 'n', '<leader>ca', '<cmd>lua vim.lsp.buf.code_action()<CR>', opts)
-	-- vim.api.nvim_buf_set_keymap(bufnr, 'v', '<leader>ca', '<cmd>lua vim.lsp.buf.range_code_action()<CR>', opts)
-	--vim.api.nvim_buf_set_keymap(bufnr, 'n', '<leader>e', '<cmd>lua vim.lsp.diagnostic.show_line_diagnostics()<CR>', opts)
-	vim.api.nvim_buf_set_keymap(bufnr, 'n', '[d', '<cmd>lua vim.lsp.diagnostic.goto_prev()<CR>', opts)
-	
-	vim.api.nvim_buf_set_keymap(bufnr, 'n', ']d', '<cmd>lua vim.lsp.diagnostic.goto_next()<CR>', opts)
-	--vim.api.nvim_buf_set_keymap(bufnr, 'n', '<leader>q', '<cmd>lua vim.lsp.diagnostic.set_loclist()<CR>', opts)
-	vim.api.nvim_buf_set_keymap(bufnr,'n','<C-s>','<cmd>lua vim.lsp.buf.formatting()<CR>',opts)
-	-- vim.cmd [[ command! Format execute 'lua vim.lsp.buf.formatting()' ]]
+  local opts = { noremap = true, silent = true }
+  vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gD', '<Cmd>lua vim.lsp.buf.declaration()<CR>', opts)
+  vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gd', '<Cmd>lua vim.lsp.buf.definition()<CR>', opts)
+  vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gi', '<cmd>lua vim.lsp.buf.implementation()<CR>', opts)
+  vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gr', '<cmd>lua vim.lsp.buf.references()<CR>', opts)
+  vim.api.nvim_buf_set_keymap(bufnr, 'n', 'K', '<Cmd>lua vim.lsp.buf.hover()<CR>', opts)
+  --vim.api.nvim_buf_set_keymap(bufnr, 'n', '<C-k>', '<cmd>lua vim.lsp.buf.signature_help()<CR>', opts)
+  --vim.api.nvim_buf_set_keymap(bufnr, 'n', '<leader>wa', '<cmd>lua vim.lsp.buf.add_workspace_folder()<CR>', opts)
+  --vim.api.nvim_buf_set_keymap(bufnr, 'n', '<leader>wr', '<cmd>lua vim.lsp.buf.remove_workspace_folder()<CR>', opts)
+  --vim.api.nvim_buf_set_keymap(bufnr, 'n', '<leader>wl', '<cmd>lua print(vim.inspect(vim.lsp.buf.list_workspace_folders()))<CR>', opts)
+  --vim.api.nvim_buf_set_keymap(bufnr, 'n', '<leader>D', '<cmd>lua vim.lsp.buf.type_definition()<CR>', opts)
+  vim.api.nvim_buf_set_keymap(bufnr, 'n', '<leader>rn', '<cmd>lua vim.lsp.buf.rename()<CR>', opts)
+  vim.api.nvim_buf_set_keymap(bufnr, 'n', '<leader>ca', '<cmd>lua vim.lsp.buf.code_action()<CR>', opts)
+  -- vim.api.nvim_buf_set_keymap(bufnr, 'v', '<leader>ca', '<cmd>lua vim.lsp.buf.range_code_action()<CR>', opts)
+  --vim.api.nvim_buf_set_keymap(bufnr, 'n', '<leader>e', '<cmd>lua vim.lsp.diagnostic.show_line_diagnostics()<CR>', opts)
+  vim.api.nvim_buf_set_keymap(bufnr, 'n', '[d', '<cmd>lua vim.lsp.diagnostic.goto_prev()<CR>', opts)
 
-	vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gd', '<Cmd>lua require(\'telescope.builtin\').lsp_definitions(require(\'telescope.themes\').get_ivy({}))<CR>', opts)
-	vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gi', '<cmd>lua require(\'telescope.builtin\').lsp_implementations(require(\'telescope.themes\').get_ivy({}))<CR>', opts)
-	vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gr', '<cmd>lua require(\'telescope.builtin\').lsp_references(require(\'telescope.themes\').get_ivy({}))<CR>', opts)
-	vim.api.nvim_buf_set_keymap(bufnr, 'n', '<leader>ca', '<cmd>lua require(\'telescope.builtin\').lsp_code_actions(require(\'telescope.themes\').get_ivy({}))<CR>', opts)
-	--vim.api.nvim_buf_set_keymap(bufnr, 'n', '<leader>ws', '<cmd>lua require(\'telescope.builtin\').lsp_workspace_symbols(require(\'telescope.themes\').get_ivy({}))<CR>', opts)
-	vim.api.nvim_buf_set_keymap(bufnr, 'n', '<leader>ws', '<cmd>lua require(\'telescope.builtin\').lsp_dynamic_workspace_symbols({symbols="interface"})<CR>', opts)
+  vim.api.nvim_buf_set_keymap(bufnr, 'n', ']d', '<cmd>lua vim.lsp.diagnostic.goto_next()<CR>', opts)
+  --vim.api.nvim_buf_set_keymap(bufnr, 'n', '<leader>q', '<cmd>lua vim.lsp.diagnostic.set_loclist()<CR>', opts)
+  vim.api.nvim_buf_set_keymap(bufnr,'n','<C-s>','<cmd>lua vim.lsp.buf.formatting()<CR>',opts)
+  -- vim.cmd [[ command! Format execute 'lua vim.lsp.buf.formatting()' ]]
+
+  vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gd', '<Cmd>lua require(\'telescope.builtin\').lsp_definitions(require(\'telescope.themes\').get_ivy({}))<CR>', opts)
+  vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gi', '<cmd>lua require(\'telescope.builtin\').lsp_implementations(require(\'telescope.themes\').get_ivy({}))<CR>', opts)
+  vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gr', '<cmd>lua require(\'telescope.builtin\').lsp_references(require(\'telescope.themes\').get_ivy({}))<CR>', opts)
+  vim.api.nvim_buf_set_keymap(bufnr, 'n', '<leader>ca', '<cmd>lua require(\'telescope.builtin\').lsp_code_actions(require(\'telescope.themes\').get_ivy({}))<CR>', opts)
+  --vim.api.nvim_buf_set_keymap(bufnr, 'n', '<leader>ws', '<cmd>lua require(\'telescope.builtin\').lsp_workspace_symbols(require(\'telescope.themes\').get_ivy({}))<CR>', opts)
+  vim.api.nvim_buf_set_keymap(bufnr, 'n', '<leader>ws', '<cmd>lua require(\'telescope.builtin\').lsp_dynamic_workspace_symbols({symbols="interface"})<CR>', opts)
 end
 
 
-  -- Setup lspconfig.
-  local capabilities = require('cmp_nvim_lsp').update_capabilities(vim.lsp.protocol.make_client_capabilities())
-  -- Replace <YOUR_LSP_SERVER> with each lsp server you've enabled.
-  require('lspconfig')['gopls'].setup {
-	  capabilities = capabilities
-	  }
+-- Setup lspconfig.
+local capabilities = require('cmp_nvim_lsp').update_capabilities(vim.lsp.protocol.make_client_capabilities())
+-- Replace <YOUR_LSP_SERVER> with each lsp server you've enabled.
+require('lspconfig')['gopls'].setup {
+	capabilities = capabilities
+	}
 
-  require('lspconfig').gopls.setup { cmd = { "~/.local/share/nvim/lsp_servers/go/gopls" } }
+require('lspconfig').gopls.setup {
+	cmd = { "~/.local/share/nvim/lsp_servers/go/gopls" },
+}
 
 
-  -- config that activates keymaps and enables snippet support
-  local function make_config()
-  local capabilities = vim.lsp.protocol.make_client_capabilities()
-  capabilities.textDocument.completion.completionItem.snippetSupport = true
-  return {
-	  -- enable snippet support
-	  capabilities = capabilities,
-	  -- map buffer local keybindings when the language server attaches
-	  on_attach = on_attach,
-	  }
+-- config that activates keymaps and enables snippet support
+local function make_config()
+local capabilities = vim.lsp.protocol.make_client_capabilities()
+capabilities.textDocument.completion.completionItem.snippetSupport = true
+return {
+	-- enable snippet support
+	capabilities = capabilities,
+	-- map buffer local keybindings when the language server attaches
+	on_attach = on_attach,
+	}
 end
 
 
@@ -306,11 +387,12 @@ if server.name == "gopls" then
 	config.settings = {
 		experimentalPostfixCompletions = true,
 		experimentalWorkspaceModule = false,
+		semanticTokens = true,
 		}
 
 	-- golang 
 	vim.api.nvim_command('command DebugRun call GoDebug()')
-	
+
 end
 -- (optional) Customize the options passed to the server
 -- if server.name == "tsserver" then
