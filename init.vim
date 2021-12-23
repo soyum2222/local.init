@@ -15,6 +15,7 @@ noremap <A-b> :lua require'dap'.toggle_breakpoint()<CR>
 noremap <A-c> :lua require'dap'.continue()<CR>
 noremap <A-s> :lua require('dap.ui.widgets').hover()<CR>
 noremap <A-w> :lua local widgets =  require('dap.ui.widgets'); widgets.centered_float(widgets.scopes)<CR>
+noremap <S-F6> :lua vim.lsp.buf.rename()<CR>
 
 
 " compatible windows terminal
@@ -96,7 +97,7 @@ Plug 'mfussenegger/nvim-dap'
 " Plug 'leoluz/nvim-dap-go'
 
 " tree sitter
-" Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}  " We recommend updating the parsers on update
+Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}  " We recommend updating the parsers on update
 
 " For vsnip users.
 Plug 'hrsh7th/cmp-vsnip'
@@ -134,9 +135,18 @@ set completeopt=menu,menuone,noselect
 " customize command
 command! GitDiff Gitsigns diffthis
 
+" highlight
+autocmd CursorHold  <buffer> lua vim.lsp.buf.document_highlight()
+autocmd CursorMoved <buffer> lua vim.lsp.buf.clear_references()
+set updatetime=1
 
 lua << EOF
 
+require'nvim-treesitter.configs'.setup {
+  highlight = {
+    enable = true,
+  },
+}
 
 -- Gitsigns
 require('gitsigns').setup {
@@ -336,6 +346,7 @@ end,
   vim.api.nvim_buf_set_keymap(bufnr, 'n', '[d', '<cmd>lua vim.lsp.diagnostic.goto_prev()<CR>', opts)
 
   vim.api.nvim_buf_set_keymap(bufnr, 'n', ']d', '<cmd>lua vim.lsp.diagnostic.goto_next()<CR>', opts)
+
   --vim.api.nvim_buf_set_keymap(bufnr, 'n', '<leader>q', '<cmd>lua vim.lsp.diagnostic.set_loclist()<CR>', opts)
   vim.api.nvim_buf_set_keymap(bufnr,'n','<C-s>','<cmd>lua vim.lsp.buf.formatting()<CR>',opts)
   -- vim.cmd [[ command! Format execute 'lua vim.lsp.buf.formatting()' ]]
@@ -352,13 +363,12 @@ end
 -- Setup lspconfig.
 local capabilities = require('cmp_nvim_lsp').update_capabilities(vim.lsp.protocol.make_client_capabilities())
 -- Replace <YOUR_LSP_SERVER> with each lsp server you've enabled.
-require('lspconfig')['gopls'].setup {
-	capabilities = capabilities
-	}
-
-require('lspconfig').gopls.setup {
-	cmd = { "~/.local/share/nvim/lsp_servers/go/gopls" },
+require('lspconfig').pylsp.setup {
+	cmd = {"pylsp"},
+	on_attach = on_attach
 }
+
+
 
 
 -- config that activates keymaps and enables snippet support
@@ -382,8 +392,9 @@ local lsp_installer = require("nvim-lsp-installer")
 lsp_installer.on_server_ready(function(server)
 local config = make_config()
 
+print(server.name)
 -- language specific config
-if server.name == "gopls" then
+if server.name == "gopls" or server.name == "pylsp" then
 	config.settings = {
 		experimentalPostfixCompletions = true,
 		experimentalWorkspaceModule = false,
