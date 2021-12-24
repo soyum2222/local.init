@@ -35,26 +35,6 @@ function GoDebug()
 	AsyncRun dlv dap -l 127.0.0.1:38697 --log --log-output="dap" "$(VIM_FILEPATH)" 
 endfunction
 
-
-" compatible windows terminal
-if &term =~ "xterm"
-	let &t_SI = "\<Esc>[6 q"
-	let &t_SR = "\<Esc>[3 q"
-	let &t_EI = "\<Esc>[2 q"
-endif
-
-
-" compatible windows terminal
-if exists('$TMUX')
-	let &t_SI .= "\e[6 q"
-	let &t_SR .= "\e[3 q"
-	let &t_EI .= "\e[2 q"
-endif
-
-" DBUI setting
-let g:db_ui_table_helpers = {'mysql': {'Count': 'select count(*) from {table}'}}
-let g:db_ui_auto_execute_table_helpers = 1
-
 call plug#begin()
 Plug 'preservim/nerdtree'
 Plug 'tpope/vim-dadbod'
@@ -102,6 +82,9 @@ Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
 " tree sitter
 Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}  " We recommend updating the parsers on update
 
+" commenter
+Plug 'preservim/nerdcommenter'
+
 " For vsnip users.
 Plug 'hrsh7th/cmp-vsnip'
 Plug 'hrsh7th/vim-vsnip'
@@ -131,6 +114,30 @@ let g:rtf_ctrl_enter = 0
 
 " Enable formatting when leaving insert mode
 " let g:rtf_on_insert_leave = 1
+"
+" DBUI setting
+let g:db_ui_table_helpers = {'mysql': {'Count': 'select count(*) from {table}'}}
+let g:db_ui_auto_execute_table_helpers = 1
+" disable golang auto format
+let g:go_fmt_autosave = 0
+
+" compatible windows terminal
+if &term =~ "xterm"
+	let &t_SI = "\<Esc>[6 q"
+	let &t_SR = "\<Esc>[3 q"
+	let &t_EI = "\<Esc>[2 q"
+endif
+
+
+" compatible windows terminal
+if exists('$TMUX')
+	let &t_SI .= "\e[6 q"
+	let &t_SR .= "\e[3 q"
+	let &t_EI .= "\e[2 q"
+endif
+
+hi Visual  guifg=#000000 guibg=#FFFFFF gui=none
+
 
 
 set completeopt=menu,menuone,noselect
@@ -141,7 +148,7 @@ command! GitDiff Gitsigns diffthis
 " highlight
 autocmd CursorHold  <buffer> lua vim.lsp.buf.document_highlight()
 autocmd CursorMoved <buffer> lua vim.lsp.buf.clear_references()
-set updatetime=3
+set updatetime=1
 
 lua << EOF
 
@@ -404,7 +411,10 @@ if server.name == "gopls" then
 		}
 
 	-- golang 
+  	local opts = { noremap = true, silent = true }
 	vim.api.nvim_command('command DebugRun call GoDebug()')
+	vim.api.nvim_set_keymap('n','<leader><CR>', ':GoFillStruct<CR>',opts)
+	vim.api.nvim_set_keymap('n','<leader>`', ':GoAddTags json yaml<CR>',opts)
 end
 
 if server.name == "pylsp" then
