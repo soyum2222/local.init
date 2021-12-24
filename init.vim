@@ -396,7 +396,7 @@ local config = make_config()
 
 print(server.name)
 -- language specific config
-if server.name == "gopls" 
+if server.name == "gopls" then 
 	config.settings = {
 		experimentalPostfixCompletions = true,
 		experimentalWorkspaceModule = false,
