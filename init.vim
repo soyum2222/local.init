@@ -96,6 +96,9 @@ Plug 'ray-x/lsp_signature.nvim'
 Plug 'mfussenegger/nvim-dap'
 " Plug 'leoluz/nvim-dap-go'
 
+" go plug
+Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
+
 " tree sitter
 Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}  " We recommend updating the parsers on update
 
@@ -127,7 +130,7 @@ colorscheme sonokai
 let g:rtf_ctrl_enter = 0
 
 " Enable formatting when leaving insert mode
-let g:rtf_on_insert_leave = 1
+" let g:rtf_on_insert_leave = 1
 
 
 set completeopt=menu,menuone,noselect
@@ -138,7 +141,7 @@ command! GitDiff Gitsigns diffthis
 " highlight
 autocmd CursorHold  <buffer> lua vim.lsp.buf.document_highlight()
 autocmd CursorMoved <buffer> lua vim.lsp.buf.clear_references()
-set updatetime=1
+set updatetime=3
 
 lua << EOF
 
@@ -184,7 +187,7 @@ require('gitsigns').setup {
 		follow_files = true
 		},
 	attach_to_untracked = true,
-	current_line_blame = true, -- Toggle with `:Gitsigns toggle_current_line_blame`
+	current_line_blame = false, -- Toggle with `:Gitsigns toggle_current_line_blame`
 	current_line_blame_opts = {
 		virt_text = true,
 		virt_text_pos = 'eol', -- 'eol' | 'overlay' | 'right_align'
@@ -192,7 +195,7 @@ require('gitsigns').setup {
 		ignore_whitespace = false,
 		},
 	current_line_blame_formatter_opts = {
-		relative_time = true
+		relative_time = false
 		},
 	sign_priority = 6,
 	update_debounce = 100,
@@ -209,7 +212,7 @@ require('gitsigns').setup {
 	yadm = {
 	enable = false
 	},
-	linehl = true
+linehl = true
 }
 
 
@@ -329,6 +332,7 @@ end,
   vim.api.nvim_buf_set_option(bufnr, 'omnifunc', 'v:lua.vim.lsp.omnifunc')
 
   local opts = { noremap = true, silent = true }
+
   vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gD', '<Cmd>lua vim.lsp.buf.declaration()<CR>', opts)
   vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gd', '<Cmd>lua vim.lsp.buf.definition()<CR>', opts)
   vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gi', '<cmd>lua vim.lsp.buf.implementation()<CR>', opts)
@@ -366,9 +370,7 @@ local capabilities = require('cmp_nvim_lsp').update_capabilities(vim.lsp.protoco
 require('lspconfig').pylsp.setup {
 	cmd = {"pylsp"},
 	on_attach = on_attach
-}
-
-
+	}
 
 
 -- config that activates keymaps and enables snippet support
@@ -394,7 +396,7 @@ local config = make_config()
 
 print(server.name)
 -- language specific config
-if server.name == "gopls" or server.name == "pylsp" then
+if server.name == "gopls" 
 	config.settings = {
 		experimentalPostfixCompletions = true,
 		experimentalWorkspaceModule = false,
@@ -403,7 +405,14 @@ if server.name == "gopls" or server.name == "pylsp" then
 
 	-- golang 
 	vim.api.nvim_command('command DebugRun call GoDebug()')
+end
 
+if server.name == "pylsp" then
+	config.settings = {
+		experimentalPostfixCompletions = true,
+		experimentalWorkspaceModule = false,
+		semanticTokens = true,
+		}
 end
 -- (optional) Customize the options passed to the server
 -- if server.name == "tsserver" then
