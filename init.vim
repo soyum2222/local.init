@@ -16,6 +16,7 @@ noremap <A-c> :lua require'dap'.continue()<CR>
 noremap <A-s> :lua require('dap.ui.widgets').hover()<CR>
 noremap <A-w> :lua local widgets =  require('dap.ui.widgets'); widgets.centered_float(widgets.scopes)<CR>
 noremap <S-F6> :lua vim.lsp.buf.rename()<CR>
+map <A-/> <plug>NERDCommenterToggle
 
 
 " compatible windows terminal
@@ -39,12 +40,11 @@ call plug#begin()
 Plug 'preservim/nerdtree'
 Plug 'tpope/vim-dadbod'
 Plug 'kristijanhusak/vim-dadbod-ui'
-Plug 'neovim/nvim-lspconfig'
 Plug 'williamboman/nvim-lsp-installer'
 Plug 'neovim/nvim-lspconfig'
 
 " hint
-Plug 'dense-analysis/ale'
+" Plug 'dense-analysis/ale'
 
 " auto hint
 Plug 'hrsh7th/nvim-cmp'
@@ -118,8 +118,17 @@ let g:rtf_ctrl_enter = 0
 " DBUI setting
 let g:db_ui_table_helpers = {'mysql': {'Count': 'select count(*) from {table}'}}
 let g:db_ui_auto_execute_table_helpers = 1
-" disable golang auto format
+
+" disable vim-go auto function
 let g:go_fmt_autosave = 0
+let g:go_mod_fmt_autosave = 0
+let g:go_asmfmt_autosave = 0
+let g:go_imports_autosave = 0
+let g:go_metalinter_autosave = 0
+let g:go_asmfmt_autosave = 0
+let g:go_auto_sameids = 0
+let g:go_auto_type_info = 0
+let g:go_template_autocreate = 0
 
 " compatible windows terminal
 if &term =~ "xterm"
@@ -401,14 +410,41 @@ local lsp_installer = require("nvim-lsp-installer")
 lsp_installer.on_server_ready(function(server)
 local config = make_config()
 
-print(server.name)
 -- language specific config
-if server.name == "gopls" then 
-	config.settings = {
-		experimentalPostfixCompletions = true,
-		experimentalWorkspaceModule = false,
-		semanticTokens = true,
-		}
+
+if server.name == "gopls" then
+	local util = require('lspconfig/util')
+	local lastRootPath = nil
+	local gopath = os.getenv("GOPATH")
+	local singleFile = false
+	if gopath == nil then
+		gopath = ""
+	end
+
+	local gopathmod = gopath..'/pkg/mod'
+
+	local currentFilePath = vim.api.nvim_buf_get_name(0) 
+
+	if not string.find(currentFilePath,gopath) then
+		-- current file not in gopath , is a single file 
+		singleFile = true
+		config.single_file_support = true
+	end
+
+	
+	config.root_dir = function(fname)
+
+		local fullpath = vim.fn.expand(fname, ':p')
+
+		if string.find(fullpath, gopathmod) and lastRootPath ~= nil then
+			print(lastRootPath)
+			return lastRootPath
+		end
+
+		lastRootPath = util.root_pattern("go.mod", ".git")(fname)
+
+		return lastRootPath
+	end
 
 	-- golang 
   	local opts = { noremap = true, silent = true }
@@ -417,9 +453,10 @@ if server.name == "gopls" then
 	vim.api.nvim_set_keymap('n','<leader>`', ':GoAddTags json yaml<CR>',opts)
 end
 
+
 if server.name == "pylsp" then
 	config.settings = {
-		experimentalPostfixCompletions = true,
+		-- experimentalPostfixCompletions = true,
 		experimentalWorkspaceModule = false,
 		semanticTokens = true,
 		}
@@ -431,6 +468,8 @@ end
 
 -- This setup() function is exactly the same as lspconfig's setup function.
 -- Refer to https://github.com/neovim/nvim-lspconfig/blob/master/doc/server_configurations.md
+
+
 server:setup(config)
 end)
 
