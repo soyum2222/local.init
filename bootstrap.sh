@@ -3,10 +3,14 @@
 WORKPATH=$(pwd)
 OHMYZSH_HOME=$HOME/.oh-my-zsh
 
-apt  remove vim
-add-apt-repository ppa:neovim-ppa/unstable
-apt update
-apt install -y neovim
+
+type nvim > /dev/null
+if [ $? -ne 0 ] ;then 
+	apt  remove vim
+	add-apt-repository ppa:neovim-ppa/unstable
+	apt update
+	apt install -y neovim
+fi
 
 # vim 
 VIMINIT_PATH=$HOME/.config/nvim
