@@ -65,6 +65,6 @@ fi
 
 # download golang
 if [ ! -d "/opt/go" ];then
-	wget https://studygolang.com/dl/golang/go1.17.2.linux-amd64.tar.gz -o /opt/golang.gz
+	wget https://studygolang.com/dl/golang/go1.17.5.linux-amd64.tar.gz -O /opt/golang.gz
 	tar -zxvf golang.gz -C /opt
 fi
