@@ -11,10 +11,11 @@ noremap <F9> :lua require'dap'.step_into()<CR>
 noremap <A-n> :tabnew<CR>
 noremap <A--> :tabp<CR>
 noremap <A-=> :tabn<CR>
-noremap <A-b> :lua require'dap'.toggle_breakpoint()<CR>
-noremap <A-c> :lua require'dap'.continue()<CR>
-noremap <A-s> :lua require('dap.ui.widgets').hover()<CR>
-noremap <A-w> :lua local widgets =  require('dap.ui.widgets'); widgets.centered_float(widgets.scopes)<CR>
+noremap <leader>b :lua require'dap'.toggle_breakpoint()<CR>
+noremap <leader>c :lua require'dap'.continue()<CR>
+noremap <leader>s :lua require('dap.ui.widgets').hover()<CR>
+noremap <leader>w :lua local widgets =  require('dap.ui.widgets'); widgets.centered_float(widgets.scopes)<CR>
+noremap <leader>g :G<CR>
 noremap <S-F6> :lua vim.lsp.buf.rename()<CR>
 map <A-/> <plug>NERDCommenterToggle
 
@@ -23,11 +24,6 @@ map <A-/> <plug>NERDCommenterToggle
 noremap n :tabnew<CR>
 noremap - :tabp<CR>
 noremap = :tabn<CR>
-noremap b :lua require'dap'.toggle_breakpoint()<CR>
-noremap c :lua require'dap'.continue()<CR>
-noremap s :lua require('dap.ui.widgets').hover()<CR>
-noremap w :lua require('dap.ui.widgets').centered_float(widgets.scopes)<CR>
-
 
 command DebugW lua local widgets = require('dap.ui.widgets');local my_sidebar = widgets.sidebar(widgets.scopes);my_sidebar.open();local widgets = require('dap.ui.widgets');local my_sidebar = widgets.sidebar(widgets.frames);my_sidebar.open();
 
