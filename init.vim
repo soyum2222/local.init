@@ -160,7 +160,7 @@ endif
 " nvim on windows enter CTRL+Z 
 let s:is_win = has('win32') || has('win64')
 if s:is_win
-    " ... other Windows specific settings
+     "... other Windows specific settings
 
     nmap <C-z> <Nop>
 endif
@@ -169,7 +169,9 @@ endif
 let g:go_term_enabled=1
 
 hi Visual  guifg=#000000 guibg=#FFFFFF gui=none
-
+hi LspReferenceText guifg=#000000 guibg=#FFFF00 gui=none 
+hi LspReferenceRead guifg=#000000 guibg=#FFFF00 gui=none 
+hi LspReferenceWrite guifg=#000000 guibg=#FFFF00 gui=none 
 
 
 set completeopt=menu,menuone,noselect
@@ -177,9 +179,7 @@ set completeopt=menu,menuone,noselect
 " customize command
 command! GitDiff Gitsigns diffthis
 
-" highlight
-"autocmd CursorHold  <buffer> lua vim.lsp.buf.document_highlight() 
-autocmd CursorMoved <buffer> lua vim.lsp.buf.clear_references();vim.lsp.buf.document_highlight() 
+
 set updatetime=10
 
 lua << EOF
@@ -371,6 +371,10 @@ end,
   vim.api.nvim_buf_set_option(bufnr, 'omnifunc', 'v:lua.vim.lsp.omnifunc')
 
   local opts = { noremap = true, silent = true }
+
+  vim.api.nvim_command('autocmd CursorHold  <buffer> lua vim.lsp.buf.document_highlight()')
+  vim.api.nvim_command('autocmd CursorHoldI <buffer> lua vim.lsp.buf.document_highlight()')
+  vim.api.nvim_command('autocmd CursorMoved <buffer> lua vim.lsp.buf.clear_references()')
 
   vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gD', '<Cmd>lua vim.lsp.buf.declaration()<CR>', opts)
   vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gd', '<Cmd>lua vim.lsp.buf.definition()<CR>', opts)
