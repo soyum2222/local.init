@@ -18,6 +18,7 @@ noremap <leader>w :lua local widgets =  require('dap.ui.widgets'); widgets.cente
 noremap <leader>g :G<CR>
 noremap <S-F6> :lua vim.lsp.buf.rename()<CR>
 map <A-/> <plug>NERDCommenterToggle
+nnoremap <C-f> <cmd>Telescope buffers<cr>
 
 
 " compatible windows terminal
