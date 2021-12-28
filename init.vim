@@ -467,6 +467,8 @@ if server.name == "gopls" then
 	vim.api.nvim_command('command DebugRun call GoDebug()')
 	vim.api.nvim_set_keymap('n','<leader><CR>', ':GoFillStruct<CR>',opts)
 	vim.api.nvim_set_keymap('n','<leader>`', ':GoAddTags json yaml<CR>',opts)
+	vim.api.nvim_set_keymap('n', '<leader>im', [[<cmd>lua require'telescope'.extensions.goimpl.goimpl{}<CR>]], {noremap=true, silent=true})
+
 end
 
 
