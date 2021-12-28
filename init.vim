@@ -132,6 +132,19 @@ let g:go_auto_sameids = 0
 let g:go_auto_type_info = 0
 let g:go_template_autocreate = 0
 
+let g:NERDTreeGitStatusIndicatorMapCustom = {
+                \ 'Modified'  :'💚',
+                \ 'Staged'    :'✚',
+                \ 'Untracked' :'🖤',
+                \ 'Renamed'   :'➜',
+                \ 'Unmerged'  :'═',
+                \ 'Deleted'   :'✖',
+                \ 'Dirty'     :'✗',
+                \ 'Ignored'   :'☒',
+                \ 'Clean'     :'✔︎',
+                \ 'Unknown'   :'?',
+                \ }
+
 " compatible windows terminal
 if &term =~ "xterm"
 	let &t_SI = "\<Esc>[6 q"
