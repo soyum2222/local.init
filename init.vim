@@ -161,6 +161,17 @@ if exists('$TMUX')
 	let &t_EI .= "\e[2 q"
 endif
 
+" nvim on windows enter CTRL+Z 
+let s:is_win = has('win32') || has('win64')
+if s:is_win
+    " ... other Windows specific settings
+
+    nmap <C-z> <Nop>
+endif
+
+" vim-go testFunc log print
+let g:go_term_enabled=1
+
 hi Visual  guifg=#000000 guibg=#FFFFFF gui=none
 
 
@@ -171,9 +182,9 @@ set completeopt=menu,menuone,noselect
 command! GitDiff Gitsigns diffthis
 
 " highlight
-autocmd CursorHold  <buffer> lua vim.lsp.buf.document_highlight()
-autocmd CursorMoved <buffer> lua vim.lsp.buf.clear_references()
-set updatetime=1
+"autocmd CursorHold  <buffer> lua vim.lsp.buf.document_highlight() 
+autocmd CursorMoved <buffer> lua vim.lsp.buf.clear_references();vim.lsp.buf.document_highlight() 
+set updatetime=10
 
 lua << EOF
 
