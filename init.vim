@@ -80,6 +80,7 @@ Plug 'mfussenegger/nvim-dap'
 
 " go plug
 Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
+Plug 'edolphin-ydf/goimpl.nvim'
 
 " tree sitter
 Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}  " We recommend updating the parsers on update
