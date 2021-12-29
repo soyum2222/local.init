@@ -6,6 +6,7 @@ set incsearch
 noremap <F2> :NERDTreeToggle<CR>
 noremap <F8> :lua require'dap'.step_over()<CR>
 noremap <F9> :lua require'dap'.step_into()<CR>
+noremap <F9> :lua require'dap'.continue()<CR>
 
 
 noremap <A-n> :tabnew<CR>
