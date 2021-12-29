@@ -31,6 +31,7 @@ command DebugW lua local widgets = require('dap.ui.widgets');local my_sidebar = 
 
 function GoDebug()
 	copen
+	lua GoDebugStar()
 	AsyncRun dlv dap -l 127.0.0.1:38697 --log --log-output="dap" "$(VIM_FILEPATH)" 
 endfunction
 
@@ -186,11 +187,72 @@ set updatetime=10
 
 lua << EOF
 
-require'nvim-treesitter.configs'.setup {
-  highlight = {
-    enable = true,
-  },
-}
+function TableString(tab, max_indent, append_str)
+	max_indent = max_indent or 3
+	append_str = append_str or ""
+	local res = append_str or ""
+	
+	local loopTableDict = {}
+	
+	local _tableString
+	function _tableString(t, indent)
+		if t == nil then
+			return "~nil"
+		elseif type(t) == "table" then
+			if loopTableDict[t] then
+				return "{loopTable}"
+			elseif indent < max_indent then
+				loopTableDict[t] = true
+				
+				local strs = {"{"}
+				
+				for k,v in pairs(t) do
+					local key = k
+					if tonumber(key) ~= nil then
+						key = "[" .. key .. "]"
+					end
+					table.insert( strs, string.rep("    ",indent+1) .. key .. "=" .. _tableString(v, indent + 1))
+				end
+
+				table.insert(strs, string.rep("    ", indent) .. "}")
+
+				return table.concat(strs, "\n")
+			else
+				return tostring(t)
+			end
+		elseif type(t) == "string" then
+			return '"' .. t .. '"'
+		else
+			return tostring(t)
+		end
+	end
+	
+	return res .. _tableString(tab, 0)
+	
+end
+
+function GoDebugStar()
+	vim.ui.input({
+		prompt="program arguments:",
+		default="",
+	},function(args)
+
+		 
+
+		for key,value in ipairs(dap.configurations.go)
+		do
+			dap.configurations.go[key].args = vim.split(args," ")
+		end
+
+		end)
+end
+
+
+	require'nvim-treesitter.configs'.setup {
+		highlight = {
+		enable = true,
+		},
+	}
 
 -- Gitsigns
 require('gitsigns').setup {
@@ -460,27 +522,27 @@ if server.name == "gopls" then
 		config.single_file_support = true
 	end
 
-	
+
 	config.root_dir = function(fname)
 
-		local fullpath = vim.fn.expand(fname, ':p')
+	local fullpath = vim.fn.expand(fname, ':p')
 
-		if string.find(fullpath, gopathmod) and lastRootPath ~= nil then
-			print(lastRootPath)
-			return lastRootPath
-		end
-
-		lastRootPath = util.root_pattern("go.mod", ".git")(fname)
-
+	if string.find(fullpath, gopathmod) and lastRootPath ~= nil then
+		print(lastRootPath)
 		return lastRootPath
 	end
 
-	-- golang 
-  	local opts = { noremap = true, silent = true }
-	vim.api.nvim_command('command DebugRun call GoDebug()')
-	vim.api.nvim_set_keymap('n','<leader><CR>', ':GoFillStruct<CR>',opts)
-	vim.api.nvim_set_keymap('n','<leader>`', ':GoAddTags json yaml<CR>',opts)
-	vim.api.nvim_set_keymap('n', '<leader>im', [[<cmd>lua require'telescope'.extensions.goimpl.goimpl{}<CR>]], {noremap=true, silent=true})
+	lastRootPath = util.root_pattern("go.mod", ".git")(fname)
+
+	return lastRootPath
+end
+
+-- golang 
+local opts = { noremap = true, silent = true }
+vim.api.nvim_command('command DebugRun call GoDebug()')
+vim.api.nvim_set_keymap('n','<leader><CR>', ':GoFillStruct<CR>',opts)
+vim.api.nvim_set_keymap('n','<leader>`', ':GoAddTags json yaml<CR>',opts)
+vim.api.nvim_set_keymap('n', '<leader>im', [[<cmd>lua require'telescope'.extensions.goimpl.goimpl{}<CR>]], {noremap=true, silent=true})
 
 end
 
@@ -493,7 +555,7 @@ if server.name == "pylsp" then
 		}
 end
 
-			
+
 -- (optional) Customize the options passed to the server
 -- if server.name == "tsserver" then
 --     opts.root_dir = function() ... end
