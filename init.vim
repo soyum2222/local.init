@@ -492,9 +492,7 @@ if server.name == "pylsp" then
 		}
 end
 
-if server.name == "cssmodules_ls" then
-	config.single_file_support = true
-end
+			
 -- (optional) Customize the options passed to the server
 -- if server.name == "tsserver" then
 --     opts.root_dir = function() ... end
