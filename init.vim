@@ -18,7 +18,7 @@ noremap <leader>w :lua local widgets =  require('dap.ui.widgets'); widgets.cente
 noremap <leader>g :G<CR>
 noremap <S-F6> :lua vim.lsp.buf.rename()<CR>
 map <A-/> <plug>NERDCommenterToggle
-nnoremap <C-f> <cmd>Telescope buffers<cr>
+nnoremap <C-f> <cmd>Telescope live_grep<cr>
 
 
 " compatible windows terminal
@@ -490,6 +490,10 @@ if server.name == "pylsp" then
 		experimentalWorkspaceModule = false,
 		semanticTokens = true,
 		}
+end
+
+if server.name == "cssmodules_ls" then
+	config.single_file_support = true
 end
 -- (optional) Customize the options passed to the server
 -- if server.name == "tsserver" then
