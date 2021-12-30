@@ -13,7 +13,7 @@ noremap <A-n> :tabnew<CR>
 noremap <A--> :tabp<CR>
 noremap <A-=> :tabn<CR>
 noremap <leader>b :lua require'dap'.toggle_breakpoint()<CR>
-noremap <leader>c :lua require'dap'.continue()<CR>
+noremap <leader>c :lua require'dap-go'.start_debug(require'dap')<CR>
 noremap <leader>s :lua require('dap.ui.widgets').hover()<CR>
 noremap <leader>w :lua local widgets =  require('dap.ui.widgets'); widgets.centered_float(widgets.scopes)<CR>
 noremap <leader>g :G<CR>
