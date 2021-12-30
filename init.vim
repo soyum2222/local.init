@@ -17,7 +17,7 @@ noremap <leader>c :lua require'dap-go'.start_debug(require'dap')<CR>
 noremap <leader>s :lua require('dap.ui.widgets').hover()<CR>
 noremap <leader>w :lua local widgets =  require('dap.ui.widgets'); widgets.centered_float(widgets.scopes)<CR>
 noremap <leader>g :G<CR>
-noremap <S-F6> :lua vim.lsp.buf.rename()<CR>
+noremap <leader><F6> :lua vim.lsp.buf.rename()<CR>
 map <A-/> <plug>NERDCommenterToggle
 nnoremap <C-f> <cmd>Telescope live_grep<cr>
 
