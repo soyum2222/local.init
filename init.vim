@@ -4,7 +4,7 @@ set number
 set incsearch
 set mouse=a
 
-noremap <F2> :NERDTreeToggle<CR>
+noremap <F2> :NERDTreeTabsToggle<CR> 
 noremap <F7> :lua require'dap'.step_into()<CR>
 noremap <F8> :lua require'dap'.step_over()<CR>
 noremap <F9> :lua require'dap'.continue()<CR>
@@ -14,7 +14,7 @@ noremap <A-n> :tabnew<CR>
 noremap <A--> :tabp<CR>
 noremap <A-=> :tabn<CR>
 noremap <leader>b :lua require'dap'.toggle_breakpoint()<CR>
-noremap <leader>c :lua require'dap-go'.start_debug(require'dap')<CR>
+noremap <leader>c :lua require'dap'.continue()<CR>
 noremap <leader>s :lua require('dap.ui.widgets').hover()<CR>
 noremap <leader>w :lua local widgets =  require('dap.ui.widgets'); widgets.centered_float(widgets.scopes)<CR>
 noremap <leader>g :G<CR>
@@ -29,6 +29,13 @@ noremap - :tabp<CR>
 noremap = :tabn<CR>
 
 command DebugW lua local widgets = require('dap.ui.widgets');local my_sidebar = widgets.sidebar(widgets.scopes);my_sidebar.open();local widgets = require('dap.ui.widgets');local my_sidebar = widgets.sidebar(widgets.frames);my_sidebar.open();
+
+autocmd BufEnter * if bufname('#') =~ 'NERD_tree_\d\+' && bufname('%') !~ 'NERD_tree_\d\+' && winnr('$') > 1 |
+    \ let buf=bufnr() | buffer# | execute "normal! \<C-W>w" | execute 'buffer'.buf | endif
+
+autocmd BufEnter * if tabpagenr('$') == 1 && winnr('$') == 1 && exists('b:NERDTree') && b:NERDTree.isTabTree() | quit | endif
+
+autocmd VimEnter * NERDTree
 
 function GoDebug()
 	copen
@@ -68,6 +75,8 @@ Plug 'nvim-lua/plenary.nvim'
 Plug 'lewis6991/gitsigns.nvim'
 Plug 'preservim/nerdtree' |
 			\ Plug 'Xuyuanp/nerdtree-git-plugin'
+Plug 'jistr/vim-nerdtree-tabs'
+
 
 " async run
 Plug 'skywind3000/asyncrun.vim'
@@ -78,6 +87,7 @@ Plug 'ray-x/lsp_signature.nvim'
 " dap
 Plug 'mfussenegger/nvim-dap'
 Plug 'soyum2222/nvim-dap-go'
+Plug 'mfussenegger/nvim-dap-python'
 
 " go plug
 Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
@@ -178,6 +188,8 @@ let g:go_term_mode = "10split"
 let g:AutoPairsShortcutJump=''
 let g:AutoPairsShortcutFastWrap=''
 let g:AutoPairsShortcutBackInsert=''
+
+
 
 hi Visual  guifg=#000000 guibg=#FFFFFF gui=none
 hi LspReferenceText guifg=#000000 guibg=#FFFF00 gui=none 
@@ -388,6 +400,8 @@ linehl = true
 
 
 require('dap-go').setup()
+require('dap-python').setup('python')
+
 
 
 -- autosave
@@ -582,6 +596,7 @@ vim.api.nvim_command('command DebugRun call GoDebug()')
 vim.api.nvim_set_keymap('n','<leader><CR>', ':GoFillStruct<CR>',opts)
 vim.api.nvim_set_keymap('n','<leader>`', ':GoAddTags json yaml<CR>',opts)
 vim.api.nvim_set_keymap('n', '<leader>im', [[<cmd>lua require'telescope'.extensions.goimpl.goimpl{}<CR>]], {noremap=true, silent=true})
+vim.api.nvim_set_keymap('n', '<leader>c', ':lua require"dap-go".start_debug(require"dap")<CR>', {noremap=true, silent=true})
 
 end
 
@@ -606,7 +621,5 @@ end
 
 server:setup(config)
 end)
-
-
 
 EOF
