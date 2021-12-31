@@ -172,6 +172,12 @@ endif
 
 " vim-go testFunc log print
 let g:go_term_enabled=1
+let g:go_term_mode = "10split"
+
+" disable auto pairs map
+let g:AutoPairsShortcutJump=''
+let g:AutoPairsShortcutFastWrap=''
+let g:AutoPairsShortcutBackInsert=''
 
 hi Visual  guifg=#000000 guibg=#FFFFFF gui=none
 hi LspReferenceText guifg=#000000 guibg=#FFFF00 gui=none 
