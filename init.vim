@@ -2,6 +2,7 @@ set clipboard=unnamed
 set relativenumber
 set number
 set incsearch
+set mouse=a
 
 noremap <F2> :NERDTreeToggle<CR>
 noremap <F7> :lua require'dap'.step_into()<CR>
@@ -51,6 +52,7 @@ Plug 'hrsh7th/cmp-nvim-lsp'
 Plug 'hrsh7th/cmp-buffer'
 Plug 'hrsh7th/cmp-path'
 Plug 'hrsh7th/cmp-cmdline'
+Plug 'jiangmiao/auto-pairs'
 
 " auto save
 Plug 'Pocco81/AutoSave.nvim'
