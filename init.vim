@@ -102,10 +102,9 @@ Plug 'preservim/nerdcommenter'
 " For vsnip users.
 Plug 'hrsh7th/cmp-vsnip'
 Plug 'hrsh7th/vim-vsnip'
-Plug 'saadparwaiz1/cmp_luasnip'
-Plug 'L3MON4D3/LuaSnip'
-Plug 'nvim-telescope/telescope.nvim'
-Plug 'nvim-lua/plenary.nvim'
+Plug 'hrsh7th/vim-vsnip-integ'
+Plug 'SirVer/ultisnips'
+Plug 'honza/vim-snippets' 
 call plug#end()
 
 " scheme
@@ -189,7 +188,15 @@ let g:AutoPairsShortcutJump=''
 let g:AutoPairsShortcutFastWrap=''
 let g:AutoPairsShortcutBackInsert=''
 
+" Trigger configuration. You need to change this to something other than <tab> if you use one of the following:
+" - https://github.com/Valloric/YouCompleteMe
+" - https://github.com/nvim-lua/completion-nvim
+let g:UltiSnipsExpandTrigger="<tab>"
+let g:UltiSnipsJumpForwardTrigger="<c-b>"
+let g:UltiSnipsJumpBackwardTrigger="<c-z>"
 
+" If you want :UltiSnipsEdit to split your window.
+let g:UltiSnipsEditSplit="vertical"
 
 hi Visual  guifg=#000000 guibg=#FFFFFF gui=none
 hi LspReferenceText guifg=#000000 guibg=#FFFF00 gui=none 
@@ -428,55 +435,58 @@ debounce_delay = 135
 local cmp = require'cmp'
 
 cmp.setup({
-snippet = {
-	-- REQUIRED - you must specify a snippet engine
-	expand = function(args)
-	vim.fn["vsnip#anonymous"](args.body) -- For `vsnip` users.
-	-- require('luasnip').lsp_expand(args.body) -- For `luasnip` users.
-	-- vim.fn["UltiSnips#Anon"](args.body) -- For `ultisnips` users.
-	-- require'snippy'.expand_snippet(args.body) -- For `snippy` users.
-end,
-},
 
-    mapping = {
-	    ['<C-b>'] = cmp.mapping(cmp.mapping.scroll_docs(-4), { 'i', 'c' }),
-	    ['<C-f>'] = cmp.mapping(cmp.mapping.scroll_docs(4), { 'i', 'c' }),
-	    ['<C-Space>'] = cmp.mapping(cmp.mapping.complete(), { 'i', 'c' }),
-	    ['<C-y>'] = cmp.config.disable, -- Specify `cmp.config.disable` if you want to remove the default `<C-y>` mapping.
-	    ['<C-e>'] = cmp.mapping({
-	    i = cmp.mapping.abort(),
-	    c = cmp.mapping.close(),
-	    }),
-    -- Accept currently selected item. If none selected, `select` first item.
-    -- Set `select` to `false` to only confirm explicitly selected items.
-    ['<CR>'] = cmp.mapping.confirm({ select = true }),
-    },
-    sources = cmp.config.sources({
-    { name = 'nvim_lsp' },
-    { name = 'vsnip' }, -- For vsnip users.
-    -- { name = 'luasnip' }, -- For luasnip users.
-    -- { name = 'ultisnips' }, -- For ultisnips users.
-    -- { name = 'snippy' }, -- For snippy users.
-    }, {
-    { name = 'buffer' },
-    })
-  })
 
-  -- Use buffer source for `/` (if you enabled `native_menu`, this won't work anymore).
-  cmp.setup.cmdline('/', {
-	  sources = {
-		  { name = 'buffer' }
-		  }
-	  })
+	preselect = 2,
+	snippet = {
+		-- REQUIRED - you must specify a snippet engine
+		expand = function(args)
+		vim.fn["vsnip#anonymous"](args.body) -- For `vsnip` users.
+		-- require('luasnip').lsp_expand(args.body) -- For `luasnip` users.
+		-- vim.fn["UltiSnips#Anon"](args.body) -- For `ultisnips` users.
+		-- require'snippy'.expand_snippet(args.body) -- For `snippy` users.
+	end,
+	},
 
-  -- Use cmdline & path source for ':' (if you enabled `native_menu`, this won't work anymore).
-  -- cmp.setup.cmdline(':', {
-  --         sources = cmp.config.sources({
-  --         { name = 'path' }
-  --         }, {
-  --         { name = 'cmdline' }
-  --         })
-  -- })
+    	mapping = {
+    	        ['<C-b>'] = cmp.mapping(cmp.mapping.scroll_docs(-4), { 'i', 'c' }),
+    	        ['<C-f>'] = cmp.mapping(cmp.mapping.scroll_docs(4), { 'i', 'c' }),
+    	        ['<C-Space>'] = cmp.mapping(cmp.mapping.complete(), { 'i', 'c' }),
+    	        ['<C-y>'] = cmp.config.disable, -- Specify `cmp.config.disable` if you want to remove the default `<C-y>` mapping.
+    	        ['<C-e>'] = cmp.mapping({
+    	        i = cmp.mapping.abort(),
+    	        c = cmp.mapping.close(),
+    	        }),
+    	-- Accept currently selected item. If none selected, `select` first item.
+    	-- Set `select` to `false` to only confirm explicitly selected items.
+    	['<CR>'] = cmp.mapping.confirm({ select = true }),
+    	},
+    	sources = cmp.config.sources({
+    	{ name = 'nvim_lsp' },
+    	-- { name = 'vsnip' }, -- For vsnip users. -- { name = 'luasnip' }, -- For luasnip users.
+    	{ name = 'ultisnips' }, -- For ultisnips users.
+    	-- { name = 'snippy' }, -- For snippy users.
+    	}, {
+    	{ name = 'buffer' },
+    	})
+})
+
+-- Use buffer source for `/` (if you enabled `native_menu`, this won't work anymore).
+cmp.setup.cmdline('/', {
+        sources = {
+      	  { name = 'buffer' }
+      	  }
+        })
+
+
+-- Use cmdline & path source for ':' (if you enabled `native_menu`, this won't work anymore).
+-- cmp.setup.cmdline(':', {
+--         sources = cmp.config.sources({
+--         { name = 'path' }
+--         }, {
+--         { name = 'cmdline' }
+--         })
+-- })
 
 
 
@@ -525,7 +535,6 @@ end
 
 
 -- Setup lspconfig.
-local capabilities = require('cmp_nvim_lsp').update_capabilities(vim.lsp.protocol.make_client_capabilities())
 -- Replace <YOUR_LSP_SERVER> with each lsp server you've enabled.
 require('lspconfig').pylsp.setup {
 	cmd = {"pylsp"},
@@ -535,7 +544,7 @@ require('lspconfig').pylsp.setup {
 
 -- config that activates keymaps and enables snippet support
 local function make_config()
-local capabilities = vim.lsp.protocol.make_client_capabilities()
+local capabilities = require('cmp_nvim_lsp').update_capabilities(vim.lsp.protocol.make_client_capabilities())
 capabilities.textDocument.completion.completionItem.snippetSupport = true
 return {
 	-- enable snippet support
