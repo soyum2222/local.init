@@ -109,6 +109,8 @@ Plug 'honza/vim-snippets'
 " scrollbar
 Plug 'dstein64/nvim-scrollview'
 
+" telescope
+Plug 'nvim-telescope/telescope.nvim'
 call plug#end()
 
 " scheme
