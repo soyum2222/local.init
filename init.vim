@@ -105,6 +105,10 @@ Plug 'hrsh7th/vim-vsnip'
 Plug 'hrsh7th/vim-vsnip-integ'
 Plug 'SirVer/ultisnips'
 Plug 'honza/vim-snippets' 
+
+" scrollbar
+Plug 'dstein64/nvim-scrollview'
+
 call plug#end()
 
 " scheme
@@ -211,6 +215,13 @@ command! GitDiff Gitsigns diffthis
 
 
 set updatetime=10
+
+augroup ScrollbarInit
+	  autocmd!
+	  autocmd WinScrolled,VimResized,QuitPre * silent! lua require('scrollbar').show()
+	  autocmd WinEnter,FocusGained           * silent! lua require('scrollbar').show()
+	  autocmd WinLeave,BufLeave,BufWinLeave,FocusLost            * silent! lua require('scrollbar').clear()
+augroup end
 
 lua << EOF
 
