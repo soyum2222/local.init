@@ -20,7 +20,9 @@ noremap <leader>w :lua local widgets =  require('dap.ui.widgets'); widgets.cente
 noremap <leader>g :G<CR>
 noremap <leader><F6> :lua vim.lsp.buf.rename()<CR>
 map <A-/> <plug>NERDCommenterToggle
-nnoremap <C-f> <cmd>Telescope live_grep<cr>
+nnoremap <C-f> <cmd>lua require('telescope.builtin').live_grep({cwd=FilePath()})<cr>
+nnoremap <leader><C-f> <cmd>lua require('telescope.builtin').live_grep()<cr>
+nnoremap <leader><F1> <cmd>NERDTreeFind<cr>
 
 
 " compatible windows terminal
@@ -226,6 +228,27 @@ augroup ScrollbarInit
 augroup end
 
 lua << EOF
+
+function FilePath()
+	
+	local sep = "/"
+	if vim.loop.os_uname().sysname == "Windows_NT" then
+		sep = "\\"
+	end
+	local currentFilePath = vim.api.nvim_buf_get_name(0) 
+	local s = vim.split(currentFilePath,sep)
+	local dir = ""
+
+
+	for k, v in pairs(s) do
+		if k~=#s then
+			dir = dir..v..sep
+		end
+	end
+
+	return dir
+end
+
 
 function TableString(tab, max_indent, append_str)
 	max_indent = max_indent or 3
@@ -454,9 +477,9 @@ cmp.setup({
 	snippet = {
 		-- REQUIRED - you must specify a snippet engine
 		expand = function(args)
-		vim.fn["vsnip#anonymous"](args.body) -- For `vsnip` users.
+		-- vim.fn["vsnip#anonymous"](args.body) -- For `vsnip` users.
 		-- require('luasnip').lsp_expand(args.body) -- For `luasnip` users.
-		-- vim.fn["UltiSnips#Anon"](args.body) -- For `ultisnips` users.
+		vim.fn["UltiSnips#Anon"](args.body) -- For `ultisnips` users.
 		-- require'snippy'.expand_snippet(args.body) -- For `snippy` users.
 	end,
 	},
@@ -535,7 +558,7 @@ cmp.setup.cmdline('/', {
   vim.api.nvim_buf_set_keymap(bufnr, 'n', ']d', '<cmd>lua vim.lsp.diagnostic.goto_next()<CR>', opts)
 
   --vim.api.nvim_buf_set_keymap(bufnr, 'n', '<leader>q', '<cmd>lua vim.lsp.diagnostic.set_loclist()<CR>', opts)
-  vim.api.nvim_buf_set_keymap(bufnr,'n','<C-s>','<cmd>lua vim.lsp.buf.formatting()<CR>',opts)
+  vim.api.nvim_buf_set_keymap(bufnr,'n','<C-s>','<cmd>silent !lua vim.lsp.buf.formatting()<CR>',opts)
   -- vim.cmd [[ command! Format execute 'lua vim.lsp.buf.formatting()' ]]
 
   vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gd', '<Cmd>lua require(\'telescope.builtin\').lsp_definitions(require(\'telescope.themes\').get_ivy({}))<CR>', opts)
