@@ -19,6 +19,8 @@ noremap <leader>s :lua require('dap.ui.widgets').hover()<CR>
 noremap <leader>w :lua local widgets =  require('dap.ui.widgets'); widgets.centered_float(widgets.scopes)<CR>
 noremap <leader>g :G<CR>
 noremap <leader><F6> :lua vim.lsp.buf.rename()<CR>
+noremap <leader><Esc> :q!<cr>
+
 map <A-/> <plug>NERDCommenterToggle
 nnoremap <C-f> <cmd>lua require('telescope.builtin').live_grep({cwd=FilePath()})<cr>
 nnoremap <leader><C-f> <cmd>lua require('telescope.builtin').live_grep()<cr>
@@ -526,9 +528,9 @@ cmp.setup.cmdline('/', {
 
 
 
-  -- LSP settings
-  local nvim_lsp = require 'lspconfig'
-  local on_attach = function(_, bufnr)
+-- LSP settings
+local nvim_lsp = require 'lspconfig'
+local on_attach = function(info, bufnr)
   require "lsp_signature".on_attach() 
 
   vim.api.nvim_buf_set_option(bufnr, 'omnifunc', 'v:lua.vim.lsp.omnifunc')
@@ -558,7 +560,11 @@ cmp.setup.cmdline('/', {
   vim.api.nvim_buf_set_keymap(bufnr, 'n', ']d', '<cmd>lua vim.lsp.diagnostic.goto_next()<CR>', opts)
 
   --vim.api.nvim_buf_set_keymap(bufnr, 'n', '<leader>q', '<cmd>lua vim.lsp.diagnostic.set_loclist()<CR>', opts)
-  vim.api.nvim_buf_set_keymap(bufnr,'n','<C-s>','<cmd>silent !lua vim.lsp.buf.formatting()<CR>',opts)
+  if info.name == "gopls" then
+	  vim.api.nvim_buf_set_keymap(bufnr,'n','<C-s>','<cmd>GoFmt<CR>',opts)
+  else
+  	vim.api.nvim_buf_set_keymap(bufnr,'n','<C-s>','<cmd>silent !lua vim.lsp.buf.formatting()<CR>',opts)
+  end
   -- vim.cmd [[ command! Format execute 'lua vim.lsp.buf.formatting()' ]]
 
   vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gd', '<Cmd>lua require(\'telescope.builtin\').lsp_definitions(require(\'telescope.themes\').get_ivy({}))<CR>', opts)
