@@ -563,7 +563,7 @@ local on_attach = function(info, bufnr)
   if info.name == "gopls" then
 	  vim.api.nvim_buf_set_keymap(bufnr,'n','<C-s>','<cmd>GoFmt<CR>',opts)
   else
-  	vim.api.nvim_buf_set_keymap(bufnr,'n','<C-s>','<cmd>silent !lua vim.lsp.buf.formatting()<CR>',opts)
+  	vim.api.nvim_buf_set_keymap(bufnr,'n','<C-s>','<cmd>silent lua vim.lsp.buf.formatting()<CR>',opts)
   end
   -- vim.cmd [[ command! Format execute 'lua vim.lsp.buf.formatting()' ]]
 
