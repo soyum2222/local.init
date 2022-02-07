@@ -3,6 +3,7 @@ set relativenumber
 set number
 set incsearch
 set mouse=a
+set fileencodings=utf-8,gbk
 
 noremap <F2> :NERDTreeTabsToggle<CR> 
 noremap <F7> :lua require'dap'.step_into()<CR>
