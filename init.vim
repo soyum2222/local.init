@@ -567,9 +567,6 @@ local on_attach = function(info, bufnr)
 	  vim.api.nvim_set_keymap('n','<leader>`', ':GoAddTags json yaml<CR>',opts)
 	  vim.api.nvim_set_keymap('n', '<leader>im', [[<cmd>lua require'telescope'.extensions.goimpl.goimpl{}<CR>]], opts)
 	  vim.api.nvim_set_keymap('n', '<leader>c', ':lua require"dap-go".start_debug(require"dap")<CR>', opts)
-  elseif info.name == "pylsp" then
-  	vim.api.nvim_buf_set_keymap(bufnr,'n','<C-s>','<cmd>%!yapf %<CR>',opts)
-	vim.api.nvim_set_keymap('n', '<leader>c', ':lua require"dap".continue()<CR>', opts)
   else
 	vim.api.nvim_set_keymap('n', '<leader>c', ':lua require"dap".continue()<CR>', opts)
   	vim.api.nvim_buf_set_keymap(bufnr,'n','<C-s>','<cmd>silent lua vim.lsp.buf.formatting()<CR>',opts)
