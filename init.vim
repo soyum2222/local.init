@@ -14,7 +14,7 @@ noremap <A-n> :tabnew<CR>
 noremap <A--> :tabp<CR>
 noremap <A-=> :tabn<CR>
 noremap <leader>b :lua require'dap'.toggle_breakpoint()<CR>
-noremap <leader>c :lua require'dap'.continue()<CR>
+"noremap <leader>c :lua require'dap'.continue()<CR>
 noremap <leader>s :lua require('dap.ui.widgets').hover()<CR>
 noremap <leader>w :lua local widgets =  require('dap.ui.widgets'); widgets.centered_float(widgets.scopes)<CR>
 noremap <leader>g :G<CR>
@@ -562,7 +562,16 @@ local on_attach = function(info, bufnr)
   --vim.api.nvim_buf_set_keymap(bufnr, 'n', '<leader>q', '<cmd>lua vim.lsp.diagnostic.set_loclist()<CR>', opts)
   if info.name == "gopls" then
 	  vim.api.nvim_buf_set_keymap(bufnr,'n','<C-s>','<cmd>GoFmt<CR>',opts)
+	  vim.api.nvim_command('command DebugRun call GoDebug()')
+	  vim.api.nvim_set_keymap('n','<leader><CR>', ':GoFillStruct<CR>',opts)
+	  vim.api.nvim_set_keymap('n','<leader>`', ':GoAddTags json yaml<CR>',opts)
+	  vim.api.nvim_set_keymap('n', '<leader>im', [[<cmd>lua require'telescope'.extensions.goimpl.goimpl{}<CR>]], opts)
+	  vim.api.nvim_set_keymap('n', '<leader>c', ':lua require"dap-go".start_debug(require"dap")<CR>', opts)
+  elseif info.name == "pylsp" then
+  	vim.api.nvim_buf_set_keymap(bufnr,'n','<C-s>','<cmd>%!yapf %<CR>',opts)
+	vim.api.nvim_set_keymap('n', '<leader>c', ':lua require"dap".continue()<CR>', opts)
   else
+	vim.api.nvim_set_keymap('n', '<leader>c', ':lua require"dap".continue()<CR>', opts)
   	vim.api.nvim_buf_set_keymap(bufnr,'n','<C-s>','<cmd>silent lua vim.lsp.buf.formatting()<CR>',opts)
   end
   -- vim.cmd [[ command! Format execute 'lua vim.lsp.buf.formatting()' ]]
@@ -641,13 +650,6 @@ if server.name == "gopls" then
 	return lastRootPath
 end
 
--- golang 
-local opts = { noremap = true, silent = true }
-vim.api.nvim_command('command DebugRun call GoDebug()')
-vim.api.nvim_set_keymap('n','<leader><CR>', ':GoFillStruct<CR>',opts)
-vim.api.nvim_set_keymap('n','<leader>`', ':GoAddTags json yaml<CR>',opts)
-vim.api.nvim_set_keymap('n', '<leader>im', [[<cmd>lua require'telescope'.extensions.goimpl.goimpl{}<CR>]], {noremap=true, silent=true})
-vim.api.nvim_set_keymap('n', '<leader>c', ':lua require"dap-go".start_debug(require"dap")<CR>', {noremap=true, silent=true})
 
 end
 
