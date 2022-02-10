@@ -204,6 +204,7 @@ hi Visual  guifg=#000000 guibg=#FFFFFF gui=none
 hi LspReferenceText guifg=#000000 guibg=#FFFF00 gui=none 
 hi LspReferenceRead guifg=#000000 guibg=#FFFF00 gui=none 
 hi LspReferenceWrite guifg=#000000 guibg=#FFFF00 gui=none 
+hi CocHighlightText guifg=#000000 guibg=#FFFF00 gui=none
 
 
 set completeopt=menu,menuone,noselect
