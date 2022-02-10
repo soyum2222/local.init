@@ -22,6 +22,8 @@ noremap <leader>g :G<CR>
 nmap <leader><F6> <Plug>(coc-rename)
 noremap <leader><Esc> :q!<cr>
 noremap <C-s> :call CocActionAsync('format')<CR>
+noremap K :call CocActionAsync('showSignatureHelp')<CR>
+
 
 map <A-/> <plug>NERDCommenterToggle
 nnoremap <C-f> <cmd>lua require('telescope.builtin').live_grep({cwd=FilePath()})<cr>
@@ -91,6 +93,9 @@ Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}  " We recommend upda
 Plug 'preservim/nerdcommenter'
 
 " For vsnip users.
+Plug 'hrsh7th/vim-vsnip'
+Plug 'hrsh7th/vim-vsnip-integ'
+"Plug 'SirVer/ultisnips'
 Plug 'honza/vim-snippets' 
 
 " scrollbar
@@ -176,7 +181,9 @@ endif
 let g:go_term_enabled=1
 let g:go_term_mode = "10split"
 
+" coc.nvim
 let g:coc_config_home = '~/local.init/'
+let g:coc_global_extensions = ['coc-json', 'coc-git','coc-clangd','coc-pyright','coc-snippets']
 
 " disable auto pairs map
 let g:AutoPairsShortcutJump=''
