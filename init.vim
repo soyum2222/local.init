@@ -3,6 +3,7 @@ set relativenumber
 set number
 set incsearch
 set mouse=a
+set fileencodings=utf-8,gbk
 
 noremap <F2> :NERDTreeTabsToggle<CR> 
 noremap <F7> :lua require'dap'.step_into()<CR>
@@ -14,12 +15,13 @@ noremap <A-n> :tabnew<CR>
 noremap <A--> :tabp<CR>
 noremap <A-=> :tabn<CR>
 noremap <leader>b :lua require'dap'.toggle_breakpoint()<CR>
-"noremap <leader>c :lua require'dap'.continue()<CR>
+noremap <leader>c :lua DapDebug()<CR>
 noremap <leader>s :lua require('dap.ui.widgets').hover()<CR>
 noremap <leader>w :lua local widgets =  require('dap.ui.widgets'); widgets.centered_float(widgets.scopes)<CR>
 noremap <leader>g :G<CR>
-noremap <leader><F6> :lua vim.lsp.buf.rename()<CR>
+nmap <leader><F6> <Plug>(coc-rename)
 noremap <leader><Esc> :q!<cr>
+noremap <C-s> :call CocActionAsync('format')<CR>
 
 map <A-/> <plug>NERDCommenterToggle
 nnoremap <C-f> <cmd>lua require('telescope.builtin').live_grep({cwd=FilePath()})<cr>
@@ -41,28 +43,13 @@ autocmd BufEnter * if tabpagenr('$') == 1 && winnr('$') == 1 && exists('b:NERDTr
 
 autocmd VimEnter * NERDTree
 
-function GoDebug()
-	copen
-	lua GoDebugStar()
-	AsyncRun dlv dap -l 127.0.0.1:38697 --log --log-output="dap" "$(VIM_FILEPATH)" 
-endfunction
-
 call plug#begin()
 Plug 'preservim/nerdtree'
 Plug 'tpope/vim-dadbod'
 Plug 'kristijanhusak/vim-dadbod-ui'
-Plug 'williamboman/nvim-lsp-installer'
-Plug 'neovim/nvim-lspconfig'
 
-" hint
-" Plug 'dense-analysis/ale'
+Plug 'neoclide/coc.nvim', {'branch': 'release'}
 
-" auto hint
-Plug 'hrsh7th/nvim-cmp'
-Plug 'hrsh7th/cmp-nvim-lsp'
-Plug 'hrsh7th/cmp-buffer'
-Plug 'hrsh7th/cmp-path'
-Plug 'hrsh7th/cmp-cmdline'
 Plug 'jiangmiao/auto-pairs'
 
 " auto save
@@ -104,14 +91,10 @@ Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}  " We recommend upda
 Plug 'preservim/nerdcommenter'
 
 " For vsnip users.
-Plug 'hrsh7th/cmp-vsnip'
-Plug 'hrsh7th/vim-vsnip'
-Plug 'hrsh7th/vim-vsnip-integ'
-Plug 'SirVer/ultisnips'
 Plug 'honza/vim-snippets' 
 
 " scrollbar
-Plug 'dstein64/nvim-scrollview'
+" Plug 'dstein64/nvim-scrollview'
 
 " telescope
 Plug 'nvim-telescope/telescope.nvim'
@@ -193,6 +176,8 @@ endif
 let g:go_term_enabled=1
 let g:go_term_mode = "10split"
 
+let g:coc_config_home = '~/local.init/'
+
 " disable auto pairs map
 let g:AutoPairsShortcutJump=''
 let g:AutoPairsShortcutFastWrap=''
@@ -229,7 +214,124 @@ augroup ScrollbarInit
 	  autocmd WinLeave,BufLeave,BufWinLeave,FocusLost            * silent! lua require('scrollbar').clear()
 augroup end
 
+
+" TextEdit might fail if hidden is not set.
+set hidden
+
+" Some servers have issues with backup files, see #649.
+set nobackup
+set nowritebackup
+
+" Give more space for displaying messages.
+set cmdheight=2
+
+
+" Don't pass messages to |ins-completion-menu|.
+set shortmess+=c
+
+" Always show the signcolumn, otherwise it would shift the text each time
+" diagnostics appear/become resolved.
+if has("nvim-0.5.0") || has("patch-8.1.1564")
+  " Recently vim can merge signcolumn and number column into one
+  set signcolumn=number
+else
+  set signcolumn=yes
+endif
+
+" Use tab for trigger completion with characters ahead and navigate.
+" NOTE: Use command ':verbose imap <tab>' to make sure tab is not mapped by
+" other plugin before putting this into your config.
+inoremap <silent><expr> <TAB>
+      \ pumvisible() ? "\<C-n>" :
+      \ <SID>check_back_space() ? "\<TAB>" :
+      \ coc#refresh()
+inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
+
+function! s:check_back_space() abort
+  let col = col('.') - 1
+  return !col || getline('.')[col - 1]  =~# '\s'
+endfunction
+
+" Make <CR> auto-select the first completion item and notify coc.nvim to
+" format on enter, <cr> could be remapped by other vim plugin
+inoremap <silent><expr> <cr> pumvisible() ? coc#_select_confirm()
+                              \: "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
+
+" Use `[g` and `]g` to navigate diagnostics
+" Use `:CocDiagnostics` to get all diagnostics of current buffer in location list.
+nmap <silent> [g <Plug>(coc-diagnostic-prev)
+nmap <silent> ]g <Plug>(coc-diagnostic-next)
+
+" GoTo code navigation.
+nmap <silent> gd <Plug>(coc-definition)
+nmap <silent> gy <Plug>(coc-type-definition)
+nmap <silent> gi <Plug>(coc-implementation)
+nmap <silent> gr <Plug>(coc-references)
+
+" Use K to show documentation in preview window.
+nnoremap <silent> K :call <SID>show_documentation()<CR>
+
+function! s:show_documentation()
+  if (index(['vim','help'], &filetype) >= 0)
+    execute 'h '.expand('<cword>')
+  elseif (coc#rpc#ready())
+    call CocActionAsync('doHover')
+  else
+    execute '!' . &keywordprg . " " . expand('<cword>')
+  endif
+endfunction
+
+" Highlight the symbol and its references when holding the cursor.
+autocmd CursorHold * silent call CocActionAsync('highlight')
+
+" Applying codeAction to the selected region.
+" Example: `<leader>aap` for current paragraph
+xmap <leader>a  <Plug>(coc-codeaction-selected)
+nmap <leader>a  <Plug>(coc-codeaction-selected)
+
+" Remap keys for applying codeAction to the current buffer.
+nmap <leader>ac  <Plug>(coc-codeaction)
+" Apply AutoFix to problem on the current line.
+nmap <leader>qf  <Plug>(coc-fix-current)
+
+
+" Add `:OR` command for organize imports of the current buffer.
+command! -nargs=0 OR   :call     CocActionAsync('runCommand', 'editor.action.organizeImport')
+
+" Add (Neo)Vim's native statusline support.
+" NOTE: Please see `:h coc-status` for integrations with external plugins that
+" provide custom statusline: lightline.vim, vim-airline.
+set statusline^=%{coc#status()}%{get(b:,'coc_current_function','')}
+
+" Mappings for CoCList
+" Show all diagnostics.
+nnoremap <silent><nowait> <space>a  :<C-u>CocList diagnostics<cr>
+" Manage extensions.
+nnoremap <silent><nowait> <space>e  :<C-u>CocList extensions<cr>
+" Show commands.
+nnoremap <silent><nowait> <space>c  :<C-u>CocList commands<cr>
+" Find symbol of current document.
+nnoremap <silent><nowait> <space>o  :<C-u>CocList outline<cr>
+" Search workspace symbols.
+nnoremap <silent><nowait> <space>s  :<C-u>CocList -I symbols<cr>
+" Do default action for next item.
+nnoremap <silent><nowait> <space>j  :<C-u>CocNext<CR>
+" Do default action for previous item.
+nnoremap <silent><nowait> <space>k  :<C-u>CocPrev<CR>
+" Resume latest coc list.
+nnoremap <silent><nowait> <space>p  :<C-u>CocListResume<CR>
+
+
 lua << EOF
+
+function DapDebug()
+	local file_type = vim.bo.filetype
+	if file_type == "go" then
+		require"dap-go".start_debug(require"dap")
+	else
+		require"dap".continue()
+	end
+end
 
 function FilePath()
 	
@@ -237,7 +339,7 @@ function FilePath()
 	if vim.loop.os_uname().sysname == "Windows_NT" then
 		sep = "\\"
 	end
-	local currentFilePath = vim.api.nvim_buf_get_name(0) 
+	local currentFilePath = vim.api.nvim_buf_get_name(0)
 	local s = vim.split(currentFilePath,sep)
 	local dir = ""
 
@@ -296,28 +398,11 @@ function TableString(tab, max_indent, append_str)
 
 end
 
-function GoDebugStar()
-	vim.ui.input({
-		prompt="program arguments:",
-		default="",
-	},function(args)
-
-		 
-
-		for key,value in ipairs(dap.configurations.go)
-		do
-			dap.configurations.go[key].args = vim.split(args," ")
-		end
-
-		end)
-end
-
-
-	require'nvim-treesitter.configs'.setup {
+require'nvim-treesitter.configs'.setup {
 		highlight = {
 		enable = true,
 		},
-	}
+}
 
 -- Gitsigns
 require('gitsigns').setup {
@@ -383,70 +468,8 @@ require('gitsigns').setup {
 linehl = true
 }
 
--- dap = require('dap')
--- 
--- dap.adapters.go = function(callback, config)
---   local stdout = vim.loop.new_pipe(false)
---   local handle
---   local pid_or_err
---   local port = 38697
---   local opts = {
---     stdio = {nil, stdout},
---     args = {"dap", "-l", "127.0.0.1:" .. port},
---     detached = true
---   }
---   handle, pid_or_err = vim.loop.spawn("dlv", opts, function(code)
---     stdout:close()
---     handle:close()
---     if code ~= 0 then
---       print('dlv exited with code', code)
---     end
---   end)
---   assert(handle, 'Error running dlv: ' .. tostring(pid_or_err))
---   stdout:read_start(function(err, chunk)
---     assert(not err, err)
---     if chunk then
---       vim.schedule(function()
---         require('dap.repl').append(chunk)
---       end)
---     end
---   end)
---   -- Wait for delve to start
---   vim.defer_fn(
---     function()
---       callback({type = "server", host = "127.0.0.1", port = port})
---     end,
---     100)
--- end
--- 
--- dap.configurations.go = {
--- 	{
--- 			type = "go",
--- 			name = "Debug",
--- 			request = "launch",
--- 			program = "${file}"
--- 	},
--- 	{
--- 			type = "go",
--- 			name = "Debug test", -- configuration for debugging test files
--- 			request = "launch",
--- 			mode = "test",
--- 			program = "${file}"
--- 	},
--- 	-- works with go.mod packages and sub packages 
--- 	{
--- 			type = "go",
--- 			name = "Debug test (go.mod)",
--- 			request = "launch",
--- 			mode = "test",
--- 			program = "./${relativeFileDirname}"
--- 	} 
--- }
-
-
 require('dap-go').setup()
 require('dap-python').setup('python')
-
 
 
 -- autosave
@@ -469,207 +492,6 @@ debounce_delay = 135
 }
 )
 
--- Setup nvim-cmp.
-local cmp = require'cmp'
 
-cmp.setup({
-
-
-	preselect = 2,
-	snippet = {
-		-- REQUIRED - you must specify a snippet engine
-		expand = function(args)
-		-- vim.fn["vsnip#anonymous"](args.body) -- For `vsnip` users.
-		-- require('luasnip').lsp_expand(args.body) -- For `luasnip` users.
-		vim.fn["UltiSnips#Anon"](args.body) -- For `ultisnips` users.
-		-- require'snippy'.expand_snippet(args.body) -- For `snippy` users.
-	end,
-	},
-
-    	mapping = {
-    	        ['<C-b>'] = cmp.mapping(cmp.mapping.scroll_docs(-4), { 'i', 'c' }),
-    	        ['<C-f>'] = cmp.mapping(cmp.mapping.scroll_docs(4), { 'i', 'c' }),
-    	        ['<C-Space>'] = cmp.mapping(cmp.mapping.complete(), { 'i', 'c' }),
-    	        ['<C-y>'] = cmp.config.disable, -- Specify `cmp.config.disable` if you want to remove the default `<C-y>` mapping.
-    	        ['<C-e>'] = cmp.mapping({
-    	        i = cmp.mapping.abort(),
-    	        c = cmp.mapping.close(),
-    	        }),
-    	-- Accept currently selected item. If none selected, `select` first item.
-    	-- Set `select` to `false` to only confirm explicitly selected items.
-    	['<CR>'] = cmp.mapping.confirm({ select = true }),
-    	},
-    	sources = cmp.config.sources({
-    	{ name = 'nvim_lsp' },
-    	-- { name = 'vsnip' }, -- For vsnip users. -- { name = 'luasnip' }, -- For luasnip users.
-    	{ name = 'ultisnips' }, -- For ultisnips users.
-    	-- { name = 'snippy' }, -- For snippy users.
-    	}, {
-    	{ name = 'buffer' },
-    	})
-})
-
--- Use buffer source for `/` (if you enabled `native_menu`, this won't work anymore).
-cmp.setup.cmdline('/', {
-        sources = {
-      	  { name = 'buffer' }
-      	  }
-        })
-
-
--- Use cmdline & path source for ':' (if you enabled `native_menu`, this won't work anymore).
--- cmp.setup.cmdline(':', {
---         sources = cmp.config.sources({
---         { name = 'path' }
---         }, {
---         { name = 'cmdline' }
---         })
--- })
-
-
-
--- LSP settings
-local nvim_lsp = require 'lspconfig'
-local on_attach = function(info, bufnr)
-  require "lsp_signature".on_attach() 
-
-  vim.api.nvim_buf_set_option(bufnr, 'omnifunc', 'v:lua.vim.lsp.omnifunc')
-
-  local opts = { noremap = true, silent = true }
-
-  vim.api.nvim_command('autocmd CursorHold  <buffer> lua vim.lsp.buf.document_highlight()')
-  vim.api.nvim_command('autocmd CursorHoldI <buffer> lua vim.lsp.buf.document_highlight()')
-  vim.api.nvim_command('autocmd CursorMoved <buffer> lua vim.lsp.buf.clear_references()')
-
-  vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gD', '<Cmd>lua vim.lsp.buf.declaration()<CR>', opts)
-  vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gd', '<Cmd>lua vim.lsp.buf.definition()<CR>', opts)
-  vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gi', '<cmd>lua vim.lsp.buf.implementation()<CR>', opts)
-  vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gr', '<cmd>lua vim.lsp.buf.references()<CR>', opts)
-  vim.api.nvim_buf_set_keymap(bufnr, 'n', 'K', '<Cmd>lua vim.lsp.buf.hover()<CR>', opts)
-  --vim.api.nvim_buf_set_keymap(bufnr, 'n', '<C-k>', '<cmd>lua vim.lsp.buf.signature_help()<CR>', opts)
-  --vim.api.nvim_buf_set_keymap(bufnr, 'n', '<leader>wa', '<cmd>lua vim.lsp.buf.add_workspace_folder()<CR>', opts)
-  --vim.api.nvim_buf_set_keymap(bufnr, 'n', '<leader>wr', '<cmd>lua vim.lsp.buf.remove_workspace_folder()<CR>', opts)
-  --vim.api.nvim_buf_set_keymap(bufnr, 'n', '<leader>wl', '<cmd>lua print(vim.inspect(vim.lsp.buf.list_workspace_folders()))<CR>', opts)
-  --vim.api.nvim_buf_set_keymap(bufnr, 'n', '<leader>D', '<cmd>lua vim.lsp.buf.type_definition()<CR>', opts)
-  vim.api.nvim_buf_set_keymap(bufnr, 'n', '<leader>rn', '<cmd>lua vim.lsp.buf.rename()<CR>', opts)
-  vim.api.nvim_buf_set_keymap(bufnr, 'n', '<leader>ca', '<cmd>lua vim.lsp.buf.code_action()<CR>', opts)
-  -- vim.api.nvim_buf_set_keymap(bufnr, 'v', '<leader>ca', '<cmd>lua vim.lsp.buf.range_code_action()<CR>', opts)
-  --vim.api.nvim_buf_set_keymap(bufnr, 'n', '<leader>e', '<cmd>lua vim.lsp.diagnostic.show_line_diagnostics()<CR>', opts)
-  vim.api.nvim_buf_set_keymap(bufnr, 'n', '[d', '<cmd>lua vim.lsp.diagnostic.goto_prev()<CR>', opts)
-
-  vim.api.nvim_buf_set_keymap(bufnr, 'n', ']d', '<cmd>lua vim.lsp.diagnostic.goto_next()<CR>', opts)
-
-  --vim.api.nvim_buf_set_keymap(bufnr, 'n', '<leader>q', '<cmd>lua vim.lsp.diagnostic.set_loclist()<CR>', opts)
-  if info.name == "gopls" then
-	  vim.api.nvim_buf_set_keymap(bufnr,'n','<C-s>','<cmd>GoFmt<CR>',opts)
-	  vim.api.nvim_command('command DebugRun call GoDebug()')
-	  vim.api.nvim_set_keymap('n','<leader><CR>', ':GoFillStruct<CR>',opts)
-	  vim.api.nvim_set_keymap('n','<leader>`', ':GoAddTags json yaml<CR>',opts)
-	  vim.api.nvim_set_keymap('n', '<leader>im', [[<cmd>lua require'telescope'.extensions.goimpl.goimpl{}<CR>]], opts)
-	  vim.api.nvim_set_keymap('n', '<leader>c', ':lua require"dap-go".start_debug(require"dap")<CR>', opts)
-  else
-	vim.api.nvim_set_keymap('n', '<leader>c', ':lua require"dap".continue()<CR>', opts)
-  	vim.api.nvim_buf_set_keymap(bufnr,'n','<C-s>','<cmd>silent lua vim.lsp.buf.formatting()<CR>',opts)
-  end
-  -- vim.cmd [[ command! Format execute 'lua vim.lsp.buf.formatting()' ]]
-
-  vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gd', '<Cmd>lua require(\'telescope.builtin\').lsp_definitions(require(\'telescope.themes\').get_ivy({}))<CR>', opts)
-  vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gi', '<cmd>lua require(\'telescope.builtin\').lsp_implementations(require(\'telescope.themes\').get_ivy({}))<CR>', opts)
-  vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gr', '<cmd>lua require(\'telescope.builtin\').lsp_references(require(\'telescope.themes\').get_ivy({}))<CR>', opts)
-  vim.api.nvim_buf_set_keymap(bufnr, 'n', '<leader>ca', '<cmd>lua require(\'telescope.builtin\').lsp_code_actions(require(\'telescope.themes\').get_ivy({}))<CR>', opts)
-  --vim.api.nvim_buf_set_keymap(bufnr, 'n', '<leader>ws', '<cmd>lua require(\'telescope.builtin\').lsp_workspace_symbols(require(\'telescope.themes\').get_ivy({}))<CR>', opts)
-  vim.api.nvim_buf_set_keymap(bufnr, 'n', '<leader>ws', '<cmd>lua require(\'telescope.builtin\').lsp_dynamic_workspace_symbols({symbols="interface"})<CR>', opts)
-end
-
-
--- Setup lspconfig.
--- Replace <YOUR_LSP_SERVER> with each lsp server you've enabled.
-require('lspconfig').pylsp.setup {
-	cmd = {"pylsp"},
-	on_attach = on_attach
-	}
-
-
--- config that activates keymaps and enables snippet support
-local function make_config()
-local capabilities = require('cmp_nvim_lsp').update_capabilities(vim.lsp.protocol.make_client_capabilities())
-capabilities.textDocument.completion.completionItem.snippetSupport = true
-return {
-	-- enable snippet support
-	capabilities = capabilities,
-	-- map buffer local keybindings when the language server attaches
-	on_attach = on_attach,
-	}
-end
-
-
--- #region lsp install
-local lsp_installer = require("nvim-lsp-installer")
-
--- Register a handler that will be called for all installed servers.
--- Alternatively, you may also register handlers on specific server instances instead (see example below).
-lsp_installer.on_server_ready(function(server)
-local config = make_config()
-
--- language specific config
-
-if server.name == "gopls" then
-	local util = require('lspconfig/util')
-	local lastRootPath = nil
-	local gopath = os.getenv("GOPATH")
-	local singleFile = false
-	if gopath == nil then
-		gopath = ""
-	end
-
-	local gopathmod = gopath..'/pkg/mod'
-
-	local currentFilePath = vim.api.nvim_buf_get_name(0) 
-
-	if not string.find(currentFilePath,gopath) then
-		-- current file not in gopath , is a single file 
-		singleFile = true
-		config.single_file_support = true
-	end
-
-
-	config.root_dir = function(fname)
-
-	local fullpath = vim.fn.expand(fname, ':p')
-
-	if string.find(fullpath, gopathmod) and lastRootPath ~= nil then
-		print(lastRootPath)
-		return lastRootPath
-	end
-
-	lastRootPath = util.root_pattern("go.mod", ".git")(fname)
-
-	return lastRootPath
-end
-
-
-end
-
-
-if server.name == "pylsp" then
-	config.settings = {
-		-- experimentalPostfixCompletions = true,
-		experimentalWorkspaceModule = false,
-		semanticTokens = true,
-		}
-end
-
-
--- (optional) Customize the options passed to the server
--- if server.name == "tsserver" then
---     opts.root_dir = function() ... end
--- end
-
--- This setup() function is exactly the same as lspconfig's setup function.
--- Refer to https://github.com/neovim/nvim-lspconfig/blob/master/doc/server_configurations.md
-
-
-server:setup(config)
-end)
 
 EOF
