@@ -204,8 +204,7 @@ hi Visual  guifg=#000000 guibg=#FFFFFF gui=none
 hi LspReferenceText guifg=#000000 guibg=#FFFF00 gui=none 
 hi LspReferenceRead guifg=#000000 guibg=#FFFF00 gui=none 
 hi LspReferenceWrite guifg=#000000 guibg=#FFFF00 gui=none 
-hi CocHighlightText guifg=#000000 guibg=#FFFF00 gui=none
-
+hi CocHighlightText gui=bold guifg=#2b2d3a guibg=#6dcae8
 
 set completeopt=menu,menuone,noselect
 
@@ -291,6 +290,8 @@ endfunction
 
 " Highlight the symbol and its references when holding the cursor.
 autocmd CursorHold * silent call CocActionAsync('highlight')
+autocmd User CocJumpPlaceholder call CocActionAsync('showSignatureHelp')
+
 
 " Applying codeAction to the selected region.
 " Example: `<leader>aap` for current paragraph
