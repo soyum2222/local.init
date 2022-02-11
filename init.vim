@@ -22,7 +22,11 @@ noremap <leader>g :G<CR>
 nmap <leader><F6> <Plug>(coc-rename)
 noremap <leader><Esc> :q!<cr>
 noremap <C-s> :call CocActionAsync('format')<CR>
-noremap K :call CocActionAsync('showSignatureHelp')<CR>
+
+" go map
+noremap <leader><CR> :GoFillStruct<CR>
+noremap <leader>` :GoAddTags json yaml<CR>
+
 
 
 map <A-/> <plug>NERDCommenterToggle
