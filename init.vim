@@ -140,6 +140,7 @@ let g:go_asmfmt_autosave = 0
 let g:go_auto_sameids = 0
 let g:go_auto_type_info = 0
 let g:go_template_autocreate = 0
+let g:go_doc_keywordprg_enabled = 0
 
 let g:NERDTreeGitStatusIndicatorMapCustom = {
 			\ 'Modified'  :'💚',
@@ -183,7 +184,7 @@ let g:go_term_mode = "10split"
 
 " coc.nvim
 let g:coc_config_home = '~/local.init/'
-let g:coc_global_extensions = ['coc-json', 'coc-git','coc-clangd','coc-pyright','coc-snippets']
+let g:coc_global_extensions = ['coc-json', 'coc-git','coc-clangd','coc-pyright','coc-snippets','coc-go']
 
 " disable auto pairs map
 let g:AutoPairsShortcutJump=''
