@@ -5,7 +5,7 @@ set incsearch
 set mouse=a
 set fileencodings=utf-8,gbk
 
-noremap <F2> :NERDTreeTabsToggle<CR> 
+noremap <F2> :NERDTreeToggle<CR> 
 noremap <F7> :lua require'dap'.step_into()<CR>
 noremap <F8> :lua require'dap'.step_over()<CR>
 noremap <F9> :lua require'dap'.continue()<CR>
@@ -73,8 +73,6 @@ Plug 'nvim-lua/plenary.nvim'
 Plug 'lewis6991/gitsigns.nvim'
 Plug 'preservim/nerdtree' |
 			\ Plug 'Xuyuanp/nerdtree-git-plugin'
-Plug 'jistr/vim-nerdtree-tabs'
-
 
 " async run
 Plug 'skywind3000/asyncrun.vim'
@@ -97,6 +95,10 @@ Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}  " We recommend upda
 
 " commenter
 Plug 'preservim/nerdcommenter'
+
+" indentation
+Plug 'lukas-reineke/indent-blankline.nvim'
+
 
 " For vsnip users.
 Plug 'hrsh7th/vim-vsnip'
@@ -549,5 +551,33 @@ clean_command_line_interval = 0,
 debounce_delay = 135
 }
 )
+
+
+-- indentation
+
+
+vim.opt.termguicolors = true
+vim.cmd [[highlight IndentBlanklineIndent1 guifg=#E06C75 gui=nocombine]]
+vim.cmd [[highlight IndentBlanklineIndent2 guifg=#E5C07B gui=nocombine]]
+vim.cmd [[highlight IndentBlanklineIndent3 guifg=#98C379 gui=nocombine]]
+vim.cmd [[highlight IndentBlanklineIndent4 guifg=#56B6C2 gui=nocombine]]
+vim.cmd [[highlight IndentBlanklineIndent5 guifg=#61AFEF gui=nocombine]]
+vim.cmd [[highlight IndentBlanklineIndent6 guifg=#C678DD gui=nocombine]]
+
+vim.opt.list = true
+vim.opt.listchars:append("space:⋅")
+vim.opt.listchars:append("eol:↴")
+
+require("indent_blankline").setup {
+    space_char_blankline = " ",
+    char_highlight_list = {
+        "IndentBlanklineIndent1",
+        "IndentBlanklineIndent2",
+        "IndentBlanklineIndent3",
+        "IndentBlanklineIndent4",
+        "IndentBlanklineIndent5",
+        "IndentBlanklineIndent6",
+    },
+}
 
 EOF
