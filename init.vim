@@ -192,12 +192,13 @@ let g:go_term_mode = "10split"
 
 " coc.nvim
 let g:coc_config_home = '~/local.init/'
-let g:coc_global_extensions = ['coc-json', 'coc-git','coc-clangd','coc-pyright','coc-snippets','coc-go']
+let g:coc_global_extensions = ['coc-json', 'coc-clangd','coc-pyright','coc-snippets','coc-go']
 
 " disable auto pairs map
 let g:AutoPairsShortcutJump=''
 let g:AutoPairsShortcutFastWrap=''
 let g:AutoPairsShortcutBackInsert=''
+let g:AutoPairsShortcutToggle=''
 
 " Trigger configuration. You need to change this to something other than <tab> if you use one of the following:
 " - https://github.com/Valloric/YouCompleteMe
