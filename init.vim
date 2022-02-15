@@ -21,7 +21,8 @@ noremap <leader>w :lua local widgets =  require('dap.ui.widgets'); widgets.cente
 noremap <leader>g :G<CR>
 nmap <leader><F6> <Plug>(coc-rename)
 noremap <leader><Esc> :q!<cr>
-noremap <C-s> :call CocActionAsync('format')<CR>
+noremap <C-s> :lua FileFmt()<CR>
+imap <C-s> <cmd>lua FileFmt()<CR>
 
 " go map
 noremap <leader><CR> :GoFillStruct<CR>
@@ -82,6 +83,7 @@ Plug 'skywind3000/asyncrun.vim'
 Plug 'ray-x/lsp_signature.nvim'
 
 " dap
+Plug 'Pocco81/DAPInstall.nvim'
 Plug 'mfussenegger/nvim-dap'
 Plug 'soyum2222/nvim-dap-go'
 Plug 'mfussenegger/nvim-dap-python'
@@ -338,6 +340,15 @@ nnoremap <silent><nowait> <space>p  :<C-u>CocListResume<CR>
 
 lua << EOF
 
+function FileFmt()
+	local file_type = vim.bo.filetype
+	if file_type == "go" then
+		vim.api.nvim_exec([[GoFmt]],true)
+	else
+		vim.api.nvim_exec([[call CocActionAsync('format')]],true)
+	end
+end
+
 function DapDebug()
 	local file_type = vim.bo.filetype
 	if file_type == "go" then
@@ -485,6 +496,39 @@ linehl = true
 require('dap-go').setup()
 require('dap-python').setup('python')
 
+local dap = require('dap')
+dap.adapters.cppdbg = {
+  id = 'cppdbg',
+  type = 'executable',
+  command = '/home/work/extension/debugAdapters/bin/OpenDebugAD7',
+}
+
+dap.configurations.cpp = {
+  {
+    name = "Launch file",
+    type = "cppdbg",
+    request = "launch",
+    program = function()
+      return vim.fn.input('Path to executable: ', vim.fn.getcwd() .. '/', 'file')
+    end,
+    cwd = '${workspaceFolder}',
+    stopOnEntry = true,
+  },
+  {
+    name = 'Attach to gdbserver :1234',
+    type = 'cppdbg',
+    request = 'launch',
+    MIMode = 'gdb',
+    miDebuggerServerAddress = 'localhost:1234',
+    miDebuggerPath = '/usr/bin/gdb',
+    cwd = '${workspaceFolder}',
+    program = function()
+      return vim.fn.input('Path to executable: ', vim.fn.getcwd() .. '/', 'file')
+    end,
+  },
+}
+
+
 
 -- autosave
 local autosave = require("autosave")
@@ -505,7 +549,5 @@ clean_command_line_interval = 0,
 debounce_delay = 135
 }
 )
-
-
 
 EOF
