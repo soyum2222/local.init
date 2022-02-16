@@ -5,7 +5,9 @@ set incsearch
 set mouse=a
 set fileencodings=utf-8,gbk
 
-noremap <F2> :NERDTreeToggle<CR> 
+
+
+noremap <F2> :NvimTreeToggle<CR> 
 noremap <F7> :lua require'dap'.step_into()<CR>
 noremap <F8> :lua require'dap'.step_over()<CR>
 noremap <F9> :lua require'dap'.continue()<CR>
@@ -33,8 +35,7 @@ noremap <leader>` :GoAddTags json yaml<CR>
 map <A-/> <plug>NERDCommenterToggle
 nnoremap <C-f> <cmd>lua require('telescope.builtin').live_grep({cwd=FilePath()})<cr>
 nnoremap <leader><C-f> <cmd>lua require('telescope.builtin').live_grep()<cr>
-nnoremap <leader><F1> <cmd>NERDTreeFind<cr>
-
+nnoremap <leader><F1> <cmd>NvimTreeFindFile<cr>
 
 " compatible windows terminal
 noremap n :tabnew<CR>
@@ -43,15 +44,11 @@ noremap = :tabn<CR>
 
 command DebugW lua local widgets = require('dap.ui.widgets');local my_sidebar = widgets.sidebar(widgets.scopes);my_sidebar.open();local widgets = require('dap.ui.widgets');local my_sidebar = widgets.sidebar(widgets.frames);my_sidebar.open();
 
-autocmd BufEnter * if bufname('#') =~ 'NERD_tree_\d\+' && bufname('%') !~ 'NERD_tree_\d\+' && winnr('$') > 1 |
-    \ let buf=bufnr() | buffer# | execute "normal! \<C-W>w" | execute 'buffer'.buf | endif
-
-autocmd BufEnter * if tabpagenr('$') == 1 && winnr('$') == 1 && exists('b:NERDTree') && b:NERDTree.isTabTree() | quit | endif
-
-autocmd VimEnter * NERDTree
+autocmd  VimEnter  * NvimTreeToggle 
 
 call plug#begin()
-Plug 'preservim/nerdtree'
+Plug 'kyazdani42/nvim-web-devicons' " for file icons
+Plug 'kyazdani42/nvim-tree.lua'
 Plug 'tpope/vim-dadbod'
 Plug 'kristijanhusak/vim-dadbod-ui'
 
@@ -71,8 +68,6 @@ Plug 'tpope/vim-fugitive'
 " Plug 'airblade/vim-gitgutter'
 Plug 'nvim-lua/plenary.nvim'
 Plug 'lewis6991/gitsigns.nvim'
-Plug 'preservim/nerdtree' |
-			\ Plug 'Xuyuanp/nerdtree-git-plugin'
 
 " async run
 Plug 'skywind3000/asyncrun.vim'
@@ -580,5 +575,15 @@ require("indent_blankline").setup {
         "IndentBlanklineIndent6",
     },
 }
+
+-- init.lua
+
+-- following options are the default
+-- each of these are documented in `:help nvim-tree.OPTION_NAME`
+require'nvim-tree'.setup {
+	open_on_tab=true,
+	auto_close=true,
+	open_on_setup=true,
+	}
 
 EOF
