@@ -52,6 +52,9 @@ Plug 'kyazdani42/nvim-tree.lua'
 Plug 'tpope/vim-dadbod'
 Plug 'kristijanhusak/vim-dadbod-ui'
 
+Plug 'itchyny/lightline.vim'
+
+
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
 
 Plug 'jiangmiao/auto-pairs'
@@ -144,19 +147,22 @@ let g:go_auto_sameids = 0
 let g:go_auto_type_info = 0
 let g:go_template_autocreate = 0
 let g:go_doc_keywordprg_enabled = 0
+let g:go_gopls_enabled = 0
+let g:go_def_mapping_enabled = 0
+let g:go_code_completion_enabled = 0
 
-let g:NERDTreeGitStatusIndicatorMapCustom = {
-			\ 'Modified'  :'💚',
-			\ 'Staged'    :'✚',
-			\ 'Untracked' :'🖤',
-			\ 'Renamed'   :'➜',
-			\ 'Unmerged'  :'═',
-			\ 'Deleted'   :'✖',
-			\ 'Dirty'     :'✗',
-			\ 'Ignored'   :'☒',
-			\ 'Clean'     :'✔︎',
-			\ 'Unknown'   :'?',
-			\ }
+
+let g:lightline = {
+      \ 'colorscheme': 'wombat',
+      \ 'active': {
+      \   'left': [ [ 'mode', 'paste' ],
+      \             [ 'gitbranch', 'readonly', 'filename', 'modified' ] ]
+      \ },
+      \ 'component_function': {
+      \   'gitbranch': 'FugitiveHead'
+      \ },
+      \ }
+
 
 " compatible windows terminal
 if &term =~ "xterm"
@@ -341,6 +347,7 @@ lua << EOF
 function FileFmt()
 	local file_type = vim.bo.filetype
 	if file_type == "go" then
+		vim.api.nvim_exec([[GoImports]],true)
 		vim.api.nvim_exec([[GoFmt]],true)
 	else
 		vim.api.nvim_exec([[call CocActionAsync('format')]],true)
