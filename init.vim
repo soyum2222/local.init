@@ -21,10 +21,12 @@ noremap <leader>c :lua DapDebug()<CR>
 noremap <leader>s :lua require('dap.ui.widgets').hover()<CR>
 noremap <leader>w :lua local widgets =  require('dap.ui.widgets'); widgets.centered_float(widgets.scopes)<CR>
 noremap <leader>g :G<CR>
+noremap <leader>im :lua require'telescope'.extensions.goimpl.goimpl{}<CR>
+
 nmap <leader><F6> <Plug>(coc-rename)
 noremap <leader><Esc> :q!<cr>
-noremap <C-s> :lua FileFmt()<CR>
-imap <C-s> <cmd>lua FileFmt()<CR>
+noremap <C-s> :call CocActionAsync('format')<CR>
+imap <C-s> <cmd>call CocActionAsync('format')<CR>
 
 " go map
 noremap <leader><CR> :GoFillStruct<CR>
@@ -83,6 +85,8 @@ Plug 'Pocco81/DAPInstall.nvim'
 Plug 'mfussenegger/nvim-dap'
 Plug 'soyum2222/nvim-dap-go'
 Plug 'mfussenegger/nvim-dap-python'
+Plug 'rcarriga/nvim-dap-ui'
+Plug 'theHamsta/nvim-dap-virtual-text'
 
 " go plug
 Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
@@ -508,6 +512,34 @@ dap.adapters.cppdbg = {
   command = '/home/work/extension/debugAdapters/bin/OpenDebugAD7',
 }
 
+require("dapui").setup()
+
+local dap, dapui = require("dap"), require("dapui")
+dap.listeners.after.event_initialized["dapui_config"] = function()
+  dapui.open()
+end
+dap.listeners.before.event_terminated["dapui_config"] = function()
+  dapui.close()
+end
+dap.listeners.before.event_exited["dapui_config"] = function()
+  dapui.close()
+end
+
+require("nvim-dap-virtual-text").setup {
+    enabled = true,                     -- enable this plugin (the default)
+    enabled_commands = true,            -- create commands DapVirtualTextEnable, DapVirtualTextDisable, DapVirtualTextToggle, (DapVirtualTextForceRefresh for refreshing when debug adapter did not notify its termination)
+    highlight_changed_variables = true, -- highlight changed values with NvimDapVirtualTextChanged, else always NvimDapVirtualText
+    highlight_new_as_changed = false,   -- highlight new variables in the same way as changed variables (if highlight_changed_variables)
+    show_stop_reason = true,            -- show stop reason when stopped for exceptions
+    commented = false,                  -- prefix virtual text with comment string
+    -- experimental features:
+    virt_text_pos = 'eol',              -- position of virtual text, see `:h nvim_buf_set_extmark()`
+    all_frames = false,                 -- show virtual text for all stack frames not only current. Only works for debugpy on my machine.
+    virt_lines = false,                 -- show virtual lines instead of virtual text (will flicker!)
+    virt_text_win_col = nil             -- position the virtual text at a fixed window column (starting from the first text column) ,
+                                        -- e.g. 80 to position at column 80, see `:h nvim_buf_set_extmark()`
+}
+
 dap.configurations.cpp = {
   {
     name = "Launch file",
@@ -551,7 +583,7 @@ conditions = {
 write_all_buffers = false,
 on_off_commands = true,
 clean_command_line_interval = 0,
-debounce_delay = 135
+debounce_delay = 5000
 }
 )
 
