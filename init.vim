@@ -24,7 +24,7 @@ noremap <leader>g :G<CR>
 noremap <leader>im :lua require'telescope'.extensions.goimpl.goimpl{}<CR>
 
 nmap <leader><F6> <Plug>(coc-rename)
-noremap <leader><Esc> :q!<cr>
+noremap <leader>q :q!<cr>
 noremap <C-s> :call CocActionAsync('format')<CR>
 imap <C-s> <cmd>call CocActionAsync('format')<CR>
 
@@ -47,6 +47,9 @@ noremap = :tabn<CR>
 command DebugW lua local widgets = require('dap.ui.widgets');local my_sidebar = widgets.sidebar(widgets.scopes);my_sidebar.open();local widgets = require('dap.ui.widgets');local my_sidebar = widgets.sidebar(widgets.frames);my_sidebar.open();
 
 autocmd  VimEnter  * NvimTreeToggle 
+autocmd TextChanged,FocusLost,BufEnter * silent update
+
+
 
 call plug#begin()
 Plug 'kyazdani42/nvim-web-devicons' " for file icons
@@ -571,7 +574,7 @@ dap.configurations.cpp = {
 local autosave = require("autosave")
 autosave.setup(
 {
-enabled = true,
+enabled = false,
 execution_message = "AutoSave: saved at " .. vim.fn.strftime("%H:%M:%S"),
 events = {"InsertLeave", "TextChanged"},
 conditions = {
