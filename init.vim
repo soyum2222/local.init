@@ -351,6 +351,15 @@ nnoremap <silent><nowait> <space>p  :<C-u>CocListResume<CR>
 
 lua << EOF
 
+if vim.fn.has('wsl') then
+  vim.cmd [[
+  augroup Yank
+  autocmd!
+  autocmd TextYankPost * :call system('/mnt/c/windows/system32/clip.exe ',@")
+  augroup END
+  ]]
+end
+
 function FileFmt()
 	local file_type = vim.bo.filetype
 	if file_type == "go" then
