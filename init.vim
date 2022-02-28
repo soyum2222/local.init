@@ -23,6 +23,7 @@ noremap <leader>w :lua local widgets =  require('dap.ui.widgets'); widgets.cente
 noremap <leader>g :G<CR>
 noremap <leader>im :lua require'telescope'.extensions.goimpl.goimpl{}<CR>
 
+
 nmap <leader><F6> <Plug>(coc-rename)
 noremap <leader>q :q!<cr>
 noremap <C-s> :lua FileFmt()<CR>
@@ -221,6 +222,9 @@ let g:UltiSnipsJumpBackwardTrigger="<c-z>"
 
 " nerdcommenter
 let g:NERDDefaultAlign = 'left'
+
+" auto pairs
+let g:AutoPairsShortcutFastWrap = '<A-e>'
 
 let g:NERDCompactSexyComs = 1
 
