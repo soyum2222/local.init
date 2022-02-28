@@ -25,8 +25,8 @@ noremap <leader>im :lua require'telescope'.extensions.goimpl.goimpl{}<CR>
 
 nmap <leader><F6> <Plug>(coc-rename)
 noremap <leader>q :q!<cr>
-noremap <C-s> :call CocActionAsync('format')<CR>
-imap <C-s> <cmd>call CocActionAsync('format')<CR>
+noremap <C-s> :lua FileFmt()<CR>
+imap <C-s> <cmd>lua FileFmt()<CR>
 
 " go map
 noremap <leader><CR> :GoFillStruct<CR>
@@ -362,12 +362,8 @@ end
 
 function FileFmt()
 	local file_type = vim.bo.filetype
-	if file_type == "go" then
-		vim.api.nvim_exec([[GoImports]],true)
-		vim.api.nvim_exec([[GoFmt]],true)
-	else
-		vim.api.nvim_exec([[call CocActionAsync('format')]],true)
-	end
+	vim.api.nvim_exec([[call CocActionAsync('format')]],true)
+	vim.api.nvim_exec([[update]],true)
 end
 
 function DapDebug()
