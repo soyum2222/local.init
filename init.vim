@@ -28,6 +28,10 @@ noremap <leader>q :q!<cr>
 noremap <C-s> :lua FileFmt()<CR>
 imap <C-s> <cmd>lua FileFmt()<CR>
 
+noremap <C-r> :%s/
+vmap <C-r> :s/
+
+
 " go map
 noremap <leader><CR> :GoFillStruct<CR>
 noremap <leader>` :GoAddTags json yaml<CR>
@@ -214,6 +218,11 @@ let g:AutoPairsShortcutToggle=''
 let g:UltiSnipsExpandTrigger="<tab>"
 let g:UltiSnipsJumpForwardTrigger="<c-b>"
 let g:UltiSnipsJumpBackwardTrigger="<c-z>"
+
+" nerdcommenter
+let g:NERDDefaultAlign = 'left'
+
+let g:NERDCompactSexyComs = 1
 
 " If you want :UltiSnipsEdit to split your window.
 let g:UltiSnipsEditSplit="vertical"
