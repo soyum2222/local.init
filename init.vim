@@ -4,6 +4,7 @@ set number
 set incsearch
 set mouse=a
 set fileencodings=utf-8,gbk
+set ff=unix
 
 
 
@@ -224,7 +225,7 @@ let g:UltiSnipsJumpBackwardTrigger="<c-z>"
 let g:NERDDefaultAlign = 'left'
 
 " auto pairs
-let g:AutoPairsShortcutFastWrap = '<A-e>'
+let g:AutoPairsShortcutFastWrap = '<C-e>'
 
 let g:NERDCompactSexyComs = 1
 
