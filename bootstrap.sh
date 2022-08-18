@@ -4,6 +4,16 @@ WORKPATH=$(pwd)
 OHMYZSH_HOME=$HOME/.oh-my-zsh
 
 
+GITHUB_URL="https://hub.fastgit.xyz"
+
+echo "did you want use github proxy by 'https://hub.fastgit.xyz' ? (y/n)"
+read -n 1 -p "input: " input
+if [ "$input" == "y" ]; then
+	GITHUB_URL="https://hub.fastgit.xyz"
+else
+	GITHUB_URL="https://github.com"
+fi
+
 type nvim > /dev/null
 if [ $? -ne 0 ] ;then 
 	apt  remove vim
@@ -67,8 +77,14 @@ else
 	cat $WORKPATH/tmux.conf >> /etc/tmux.conf 
 fi
 
-# download golang
-if [ ! -d "/opt/go" ];then
-	wget https://studygolang.com/dl/golang/go1.17.5.linux-amd64.tar.gz -O /opt/golang.gz
-	tar -zxvf golang.gz -C /opt
+echo "did you want download golang ? (y/n)"
+read -n 1 -p "input: " input
+if [ "$input" == "y" ]; then
+	apt install -y golang
+	# download golang
+	if [ ! -d "/opt/go" ];then
+		wget https://studygolang.com/dl/golang/go1.17.5.linux-amd64.tar.gz -O /opt/golang.gz
+		tar -zxvf golang.gz -C /opt
+	fi
 fi
+
