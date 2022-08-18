@@ -6,7 +6,7 @@ OHMYZSH_HOME=$HOME/.oh-my-zsh
 
 GITHUB_URL="https://hub.fastgit.xyz"
 
-echo "did you want use github proxy by 'https://hub.fastgit.xyz' ? (y/n)"
+echo "do you want use github proxy by 'https://hub.fastgit.xyz' ? (y/n)"
 read -n 1 -p "input: " input
 if [ "$input" == "y" ]; then
 	GITHUB_URL=https://hub.fastgit.xyz
@@ -77,7 +77,7 @@ else
 	cat $WORKPATH/tmux.conf >> /etc/tmux.conf 
 fi
 
-echo "did you want download golang ? (y/n)"
+echo "do you want download golang ? (y/n)"
 read -n 1 -p "input: " input
 if [ "$input" == "y" ]; then
 	apt install -y golang
