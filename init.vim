@@ -590,7 +590,7 @@ dap.configurations.cpp = {
 
 
 -- autosave
-local autosave = require("autosave")
+local autosave = require("auto-save")
 autosave.setup(
 {
 enabled = false,
