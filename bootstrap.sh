@@ -9,9 +9,9 @@ GITHUB_URL="https://hub.fastgit.xyz"
 echo "did you want use github proxy by 'https://hub.fastgit.xyz' ? (y/n)"
 read -n 1 -p "input: " input
 if [ "$input" == "y" ]; then
-	GITHUB_URL="https://hub.fastgit.xyz"
+	GITHUB_URL=https://hub.fastgit.xyz
 else
-	GITHUB_URL="https://github.com"
+	GITHUB_URL=https://github.com
 fi
 
 type nvim > /dev/null
@@ -46,7 +46,7 @@ apt install -y zsh
 chsh -s /bin/zsh
 
 if [ ! -d "$OHMYZSH_HOME" ];then
-	git clone --depth=1 https://github.com/ohmyzsh/ohmyzsh.git ~/.oh-my-zsh
+	git clone --depth=1 $GITHUB_URL/ohmyzsh/ohmyzsh.git ~/.oh-my-zsh
 fi
 
 if [ -f "$HOME/.zshrc" ];then
@@ -58,7 +58,7 @@ fi
 
 # zsh plug
 if [ ! -d "$OHMYZSH_HOME/plugins/zsh-autosuggestions" ]; then
-	git clone --depth=1 https://github.com/zsh-users/zsh-autosuggestions.git $OHMYZSH_HOME/plugins/zsh-autosuggestions
+	git clone --depth=1 $GITHUB_URL/zsh-users/zsh-autosuggestions.git $OHMYZSH_HOME/plugins/zsh-autosuggestions
 fi
 
 # exoprt
@@ -67,7 +67,7 @@ fi
 apt install -y lua5.3
 
 if [ ! -d "/opt/z.lua" ];then
-	git clone --depth=1 https://github.com/skywind3000/z.lua.git /opt/z.lua
+	git clone --depth=1 $GITHUB_URL/skywind3000/z.lua.git /opt/z.lua
 fi
 
 # tmux
