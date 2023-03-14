@@ -14,12 +14,16 @@ else
 	GITHUB_URL=https://github.com
 fi
 
-type nvim > /dev/null
-if [ $? -ne 0 ] ;then 
-	apt  remove vim
-	add-apt-repository ppa:neovim-ppa/unstable
-	apt update
-	apt install -y neovim
+echo "do you want install neovim ? (y/n)"
+read -n 1 -p "input: " input
+if [ "$input" == "y" ]; then
+	type nvim > /dev/null
+	if [ $? -ne 0 ] ;then 
+		apt  remove vim
+		add-apt-repository ppa:neovim-ppa/unstable
+		apt update
+		apt install -y neovim
+	fi
 fi
 
 # vim 
@@ -77,14 +81,10 @@ else
 	cat $WORKPATH/tmux.conf >> /etc/tmux.conf 
 fi
 
-echo "do you want download golang ? (y/n)"
-read -n 1 -p "input: " input
-if [ "$input" == "y" ]; then
-	apt install -y golang
-	# download golang
-	if [ ! -d "/opt/go" ];then
-		wget https://studygolang.com/dl/golang/go1.17.5.linux-amd64.tar.gz -O /opt/golang.gz
-		tar -zxvf golang.gz -C /opt
-	fi
+ type go > /dev/null
+if [ $? -ne 0 ] ;then
+  add-apt-repository ppa:longsleep/golang-backports
+  apt-get update
+  apt-get install golang
 fi
 

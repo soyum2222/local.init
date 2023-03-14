@@ -58,6 +58,7 @@ autocmd TextChanged,FocusLost,BufEnter * silent update
 
 
 call plug#begin()
+Plug 'github/copilot.vim'
 Plug 'kyazdani42/nvim-web-devicons' " for file icons
 Plug 'kyazdani42/nvim-tree.lua'
 Plug 'tpope/vim-dadbod'
