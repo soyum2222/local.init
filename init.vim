@@ -44,6 +44,7 @@ map <A-/> <plug>NERDCommenterToggle
 nnoremap <C-f> <cmd>lua require('telescope.builtin').live_grep({cwd=FilePath()})<cr>
 nnoremap <leader><C-f> <cmd>lua require('telescope.builtin').live_grep()<cr>
 nnoremap <leader><F1> <cmd>NvimTreeFindFile<cr>
+nnoremap <leader>f <cmd>lua require('telescope.builtin').find_files()<cr>
 
 " compatible windows terminal
 noremap n :tabnew<CR>
