@@ -43,6 +43,7 @@ noremap <leader>` :GoAddTags json yaml<CR>
 map <A-/> <plug>NERDCommenterToggle
 nnoremap <C-f> <cmd>lua require('telescope.builtin').live_grep({cwd=FilePath()})<cr>
 nnoremap <leader><C-f> <cmd>lua require('telescope.builtin').live_grep()<cr>
+nnoremap <leader>f <cmd>lua require('telescope.builtin').find_files()<cr>
 nnoremap <leader><F1> <cmd>NvimTreeFindFile<cr>
 nnoremap <leader>f <cmd>lua require('telescope.builtin').find_files()<cr>
 
@@ -54,7 +55,7 @@ noremap = :tabn<CR>
 command DebugW lua local widgets = require('dap.ui.widgets');local my_sidebar = widgets.sidebar(widgets.scopes);my_sidebar.open();local widgets = require('dap.ui.widgets');local my_sidebar = widgets.sidebar(widgets.frames);my_sidebar.open();
 
 autocmd  VimEnter  * NvimTreeToggle 
-autocmd TextChanged,FocusLost,BufEnter * silent update
+"autocmd TextChanged,FocusLost,BufEnter * silent update
 
 
 
@@ -67,13 +68,12 @@ Plug 'kristijanhusak/vim-dadbod-ui'
 
 Plug 'itchyny/lightline.vim'
 
-
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
 
 Plug 'jiangmiao/auto-pairs'
 
 " auto save
-Plug 'Pocco81/AutoSave.nvim'
+Plug 'pocco81/auto-save.nvim'
 
 " clorscheme
 Plug 'dracula/vim', { 'as': 'dracula' }
@@ -94,7 +94,7 @@ Plug 'ray-x/lsp_signature.nvim'
 " dap
 Plug 'Pocco81/DAPInstall.nvim'
 Plug 'mfussenegger/nvim-dap'
-Plug 'soyum2222/nvim-dap-go'
+Plug 'leoluz/nvim-dap-go'
 Plug 'mfussenegger/nvim-dap-python'
 Plug 'rcarriga/nvim-dap-ui'
 Plug 'theHamsta/nvim-dap-virtual-text'
@@ -383,9 +383,10 @@ function FileFmt()
 end
 
 function DapDebug()
+	require('dap.ext.vscode').load_launchjs(nil, nil)
 	local file_type = vim.bo.filetype
 	if file_type == "go" then
-		require"dap-go".start_debug(require"dap")
+		require"dap".continue()
 	else
 		require"dap".continue()
 	end
@@ -533,7 +534,7 @@ local dap = require('dap')
 dap.adapters.cppdbg = {
   id = 'cppdbg',
   type = 'executable',
-  command = '/home/work/extension/debugAdapters/bin/OpenDebugAD7',
+  command = '/home/soyum/extension/debugAdapters/bin/OpenDebugAD7',
 }
 
 require("dapui").setup()
@@ -592,24 +593,43 @@ dap.configurations.cpp = {
 
 
 -- autosave
-local autosave = require("auto-save")
-autosave.setup(
-{
-enabled = false,
-execution_message = "AutoSave: saved at " .. vim.fn.strftime("%H:%M:%S"),
-events = {"InsertLeave", "TextChanged"},
-conditions = {
-	exists = true,
-	filename_is_not = {},
-	filetype_is_not = {},
-	modifiable = true
+require("auto-save").setup {
+    enabled = true, -- start auto-save when the plugin is loaded (i.e. when your package manager loads it)
+    execution_message = {
+		message = function() -- message to print on save
+			return ("AutoSave: saved at " .. vim.fn.strftime("%H:%M:%S"))
+		end,
+		dim = 0.18, -- dim the color of `message`
+		cleaning_interval = 1250, -- (milliseconds) automatically clean MsgArea after displaying `message`. See :h MsgArea
 	},
-write_all_buffers = false,
-on_off_commands = true,
-clean_command_line_interval = 0,
-debounce_delay = 5000
+    trigger_events = {"InsertLeave", "TextChanged"}, -- vim events that trigger auto-save. See :h events
+	-- function that determines whether to save the current buffer or not
+	-- return true: if buffer is ok to be saved
+	-- return false: if it's not ok to be saved
+	condition = function(buf)
+		local fn = vim.fn
+		local utils = require("auto-save.utils.data")
+
+		if
+			fn.getbufvar(buf, "&modifiable") == 1 and
+			utils.not_in(fn.getbufvar(buf, "&filetype"), {}) then
+			return true -- met condition(s), can save
+		end
+		return false -- can't save
+	end,
+    write_all_buffers = false, -- write all buffers when the current one meets `condition`
+    debounce_delay = 135, -- saves the file at most every `debounce_delay` milliseconds
+	callbacks = { -- functions to be executed at different intervals
+		enabling = nil, -- ran when enabling auto-save
+		disabling = nil, -- ran when disabling auto-save
+		before_asserting_save = nil, -- ran before checking `condition`
+		before_saving = nil, -- ran before doing the actual save
+		after_saving = nil -- ran after doing the actual save
+	}
 }
-)
+
+-- vim.api.nvim_set_keymap("n", "<leader>n", ":ASToggle<CR>", {})
+
 
 -- indentation
 local highlight = {
