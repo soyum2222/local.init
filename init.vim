@@ -61,6 +61,10 @@ autocmd  VimEnter  * NvimTreeToggle
 
 call plug#begin()
 Plug 'Exafunction/codeium.vim'
+
+Plug 'tpope/vim-pathogen'
+Plug 'folke/persistence.nvim'
+
 Plug 'kyazdani42/nvim-web-devicons' " for file icons
 Plug 'kyazdani42/nvim-tree.lua'
 Plug 'tpope/vim-dadbod'
@@ -413,49 +417,49 @@ function FilePath()
 end
 
 
-function TableString(tab, max_indent, append_str)
-	max_indent = max_indent or 3
-	append_str = append_str or ""
-	local res = append_str or ""
-
-	local loopTableDict = {}
-
-	local _tableString
-	function _tableString(t, indent)
-		if t == nil then
-			return "~nil"
-		elseif type(t) == "table" then
-			if loopTableDict[t] then
-				return "{loopTable}"
-			elseif indent < max_indent then
-				loopTableDict[t] = true
-
-				local strs = {"{"}
-
-				for k,v in pairs(t) do
-					local key = k
-					if tonumber(key) ~= nil then
-						key = "[" .. key .. "]"
-					end
-					table.insert( strs, string.rep("    ",indent+1) .. key .. "=" .. _tableString(v, indent + 1))
-				end
-
-				table.insert(strs, string.rep("    ", indent) .. "}")
-
-				return table.concat(strs, "\n")
-			else
-				return tostring(t)
-			end
-		elseif type(t) == "string" then
-			return '"' .. t .. '"'
-		else
-			return tostring(t)
-		end
-	end
-
-	return res .. _tableString(tab, 0)
-
-end
+-- function TableString(tab, max_indent, append_str)
+-- 	max_indent = max_indent or 3
+-- 	append_str = append_str or ""
+-- 	local res = append_str or ""
+-- 
+-- 	local loopTableDict = {}
+-- 
+-- 	local _tableString
+-- 	function _tableString(t, indent)
+-- 		if t == nil then
+-- 			return "~nil"
+-- 		elseif type(t) == "table" then
+-- 			if loopTableDict[t] then
+-- 				return "{loopTable}"
+-- 			elseif indent < max_indent then
+-- 				loopTableDict[t] = true
+-- 
+-- 				local strs = {"{"}
+-- 
+-- 				for k,v in pairs(t) do
+-- 					local key = k
+-- 					if tonumber(key) ~= nil then
+-- 						key = "[" .. key .. "]"
+-- 					end
+-- 					table.insert( strs, string.rep("    ",indent+1) .. key .. "=" .. _tableString(v, indent + 1))
+-- 				end
+-- 
+-- 				table.insert(strs, string.rep("    ", indent) .. "}")
+-- 
+-- 				return table.concat(strs, "\n")
+-- 			else
+-- 				return tostring(t)
+-- 			end
+-- 		elseif type(t) == "string" then
+-- 			return '"' .. t .. '"'
+-- 		else
+-- 			return tostring(t)
+-- 		end
+-- 	end
+-- 
+-- 	return res .. _tableString(tab, 0)
+-- 
+-- end
 
 require'nvim-treesitter.configs'.setup {
 		highlight = {
@@ -628,8 +632,32 @@ require("auto-save").setup {
 	}
 }
 
+-- indentation
+local highlight = {
+    "RainbowRed",
+    "RainbowYellow",
+    "RainbowBlue",
+    "RainbowOrange",
+    "RainbowGreen",
+    "RainbowViolet",
+    "RainbowCyan",
+}
 -- vim.api.nvim_set_keymap("n", "<leader>n", ":ASToggle<CR>", {})
 
+local hooks = require "ibl.hooks"
+-- create the highlight groups in the highlight setup hook, so they are reset
+-- every time the colorscheme changes
+hooks.register(hooks.type.HIGHLIGHT_SETUP, function()
+    vim.api.nvim_set_hl(0, "RainbowRed", { fg = "#E06C75" })
+    vim.api.nvim_set_hl(0, "RainbowYellow", { fg = "#E5C07B" })
+    vim.api.nvim_set_hl(0, "RainbowBlue", { fg = "#61AFEF" })
+    vim.api.nvim_set_hl(0, "RainbowOrange", { fg = "#D19A66" })
+    vim.api.nvim_set_hl(0, "RainbowGreen", { fg = "#98C379" })
+    vim.api.nvim_set_hl(0, "RainbowViolet", { fg = "#C678DD" })
+    vim.api.nvim_set_hl(0, "RainbowCyan", { fg = "#56B6C2" })
+end)
+
+require("ibl").setup { indent = { highlight = highlight } }
 
 -- indentation
 local highlight = {
@@ -661,6 +689,30 @@ require("ibl").setup { indent = { highlight = highlight } }
 
 -- following options are the default
 -- each of these are documented in `:help nvim-tree.OPTION_NAME`
-require("nvim-tree").setup()
+
+require'nvim-tree'.setup {
+	open_on_tab=true,
+        auto_close=true,
+       }
+
+
+
+-- Auto save session
+require("persistence").setup {
+	dir =  vim.fn.expand(vim.fn.stdpath("state") .. "/sessions/"),
+	options = {"buffers", "curdir", "tabpages", "winsize"},
+	pre_save = 
+	function()
+        	-- 如果布局有改变，就返回true，否则返回false
+        	return vim.fn.haslocaldir() == 1 or vim.fn.winnr("$") > 1
+      	end
+	}
+
+-- 恢复当前目录下的会话
+vim.api.nvim_set_keymap("n", "<leader>qs", [[<cmd>lua require("persistence").load()<cr>]], {})
+-- 恢复上次的会话
+vim.api.nvim_set_keymap("n", "<leader>ql", [[<cmd>lua require("persistence").load({last = true})<cr>]], {})
+-- 停止会话保存
+vim.api.nvim_set_keymap("n", "<leader>qd", [[<cmd>lua require("persistence").stop()<cr>]], {})
 
 EOF
