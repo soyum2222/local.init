@@ -499,7 +499,7 @@ end
 -- 	end
 -- 
 -- 	return res .. _tableString(tab, 0)
--- 
+--
 -- end
 
 require'nvim-treesitter.configs'.setup {
@@ -511,13 +511,13 @@ require'nvim-treesitter.configs'.setup {
 -- Gitsigns
 require('gitsigns').setup {
 	 signs = {
-	 	add = { hl = 'GitGutterAdd', text = '+' ,numhl='', linehl=''},
-	 	change = { hl = 'GitGutterChange', text = '~' ,numhl='', linehl=''},
-	 	delete = { hl = 'GitGutterDelete', text = '_' ,numhl='', linehl=''},
-	 	topdelete = { hl = 'GitGutterDelete', text = '‾' ,numhl='', linehl=''},
-	 	changedelete = { hl = 'GitGutterChange', text = '~' ,numhl='', linehl=''},
+	 	add = { hl = 'GitGutterAdd', text = '+' },
+	 	change = { hl = 'GitGutterChange', text = '~' },
+	 	delete = { hl = 'GitGutterDelete', text = '_' },
+	 	topdelete = { hl = 'GitGutterDelete', text = '‾' },
+	 	changedelete = { hl = 'GitGutterChange', text = '~' },
 	 	},
-	numhl = false, 
+	numhl = true, 
 	sign_priority = 6,
 
 	keymaps = {
@@ -572,7 +572,7 @@ require('gitsigns').setup {
 	yadm = {
 	enable = false
 	},
-linehl = false
+linehl = true 
 }
 
 vim.o.signcolumn = 'yes'
