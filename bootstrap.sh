@@ -24,6 +24,12 @@ if [ "$input" == "y" ]; then
 		apt update
 		apt install -y neovim
 	fi
+
+	wget https://github.com/microsoft/vscode-cpptools/releases/download/v1.20.5/cpptools-linux.vsix
+	unzip /opt/cpptools-linux.vsix 
+	mv extension /opt/
+	rm cpptools-linux.vsix
+
 fi
 
 # vim 
@@ -87,4 +93,3 @@ if [ $? -ne 0 ] ;then
   apt-get update
   apt-get install golang
 fi
-

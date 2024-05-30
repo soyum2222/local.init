@@ -585,7 +585,7 @@ local dap = require('dap')
 dap.adapters.cppdbg = {
   id = 'cppdbg',
   type = 'executable',
-  command = '/home/soyum/extension/debugAdapters/bin/OpenDebugAD7',
+  command = '~/extension/debugAdapters/bin/OpenDebugAD7',
 }
 
 
