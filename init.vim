@@ -1,12 +1,10 @@
 set clipboard=unnamed
-set relativenumber
+"set relativenumber
 set number
 set incsearch
 set mouse=a
 set fileencodings=utf-8,gbk
 set ff=unix
-
-
 
 noremap <F2> :NvimTreeToggle<CR> 
 noremap <F7> :lua require'dap'.step_into()<CR>
@@ -14,9 +12,15 @@ noremap <F8> :lua require'dap'.step_over()<CR>
 noremap <F9> :lua require'dap'.continue()<CR>
 
 
-noremap <A-n> :tabnew<CR>
-noremap <A--> :tabp<CR>
-noremap <A-=> :tabn<CR>
+"noremap <A-n> :lua tabnew()<CR>
+noremap <leader>- :lua tabprev()<CR>
+noremap <leader>= :lua tabnext()<CR>
+noremap <A--> :lua bufprev()<CR>
+noremap <A-=> :lua bufnext()<CR>
+
+noremap <leader><tab> :lua bufswitch()<CR>
+
+
 noremap <leader>b :lua require'dap'.toggle_breakpoint()<CR>
 noremap <leader>c :lua DapDebug()<CR>
 noremap <leader>s :lua require('dap.ui.widgets').hover()<CR>
@@ -65,12 +69,13 @@ Plug 'Exafunction/codeium.vim'
 Plug 'tpope/vim-pathogen'
 Plug 'folke/persistence.nvim'
 
-Plug 'kyazdani42/nvim-web-devicons' " for file icons
-Plug 'kyazdani42/nvim-tree.lua'
+Plug 'nvim-tree/nvim-tree.lua'
+Plug 'nvim-tree/nvim-web-devicons' " Recommended (for coloured icons)
+" Plug 'ryanoasis/vim-devicons' Icons without colours
+Plug 'akinsho/bufferline.nvim', { 'tag': '*' }
+
 Plug 'tpope/vim-dadbod'
 Plug 'kristijanhusak/vim-dadbod-ui'
-
-Plug 'itchyny/lightline.vim'
 
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
 
@@ -81,7 +86,6 @@ Plug 'pocco81/auto-save.nvim'
 
 " clorscheme
 Plug 'dracula/vim', { 'as': 'dracula' }
-Plug 'sainnhe/sonokai'
 
 " git plug
 Plug 'tpope/vim-fugitive'
@@ -128,20 +132,15 @@ Plug 'honza/vim-snippets'
 
 " telescope
 Plug 'nvim-telescope/telescope.nvim'
+
+Plug 'mildred/vim-bufmru'
+
+Plug 'folke/tokyonight.nvim'
+
+
 call plug#end()
 
-" scheme
-" colorscheme dracula
-" Important!!
-if has('termguicolors')
-	set termguicolors
-endif
-" the configuration options should be placed before `colorscheme sonokai`.
-let g:sonokai_style = 'andromeda'
-let g:sonokai_enable_italic = 1
-let g:sonokai_disable_italic_comment = 1
-let g:airline_theme = 'sonokai'
-colorscheme sonokai
+
 
 " By default, it will be triggered by `ENTER` in insert mode.
 " set this to 1 to use `CTRL+ENTER` instead, and keep the  
@@ -170,17 +169,6 @@ let g:go_gopls_enabled = 0
 let g:go_def_mapping_enabled = 0
 let g:go_code_completion_enabled = 0
 
-
-let g:lightline = {
-      \ 'colorscheme': 'wombat',
-      \ 'active': {
-      \   'left': [ [ 'mode', 'paste' ],
-      \             [ 'gitbranch', 'readonly', 'filename', 'modified' ] ]
-      \ },
-      \ 'component_function': {
-      \   'gitbranch': 'FugitiveHead'
-      \ },
-      \ }
 
 
 " compatible windows terminal
@@ -347,7 +335,6 @@ command! -nargs=0 OR   :call     CocActionAsync('runCommand', 'editor.action.org
 
 " Add (Neo)Vim's native statusline support.
 " NOTE: Please see `:h coc-status` for integrations with external plugins that
-" provide custom statusline: lightline.vim, vim-airline.
 set statusline^=%{coc#status()}%{get(b:,'coc_current_function','')}
 
 " Mappings for CoCList
@@ -371,6 +358,56 @@ nnoremap <silent><nowait> <space>p  :<C-u>CocListResume<CR>
 
 lua << EOF
 
+vim.cmd[[colorscheme tokyonight]]
+
+
+last_tab = vim.api.nvim_get_current_tabpage()
+
+function tabnew()
+	last_tab = vim.api.nvim_get_current_tabpage()
+	vim.api.nvim_command("tabnew")
+end
+
+function tabnext()
+	last_tab = vim.api.nvim_get_current_tabpage()
+	vim.api.nvim_command("tabnext")
+end
+
+function tabprev()
+	last_tab = vim.api.nvim_get_current_tabpage()
+	vim.api.nvim_command("tabprev")
+end
+
+function tabswitch()
+	local_last_tab = vim.api.nvim_get_current_tabpage()
+	vim.api.nvim_set_current_tabpage(last_tab)
+	last_tab = local_last_tab
+end
+
+
+local last_buffer = 0
+
+function bufnext()
+	last_buffer = vim.fn.bufnr('%')
+	print(last_buffer)
+	vim.api.nvim_command("BufferLineCycleNext")
+end
+
+function bufprev()
+	last_buffer = vim.fn.bufnr('%')
+	print(last_buffer)
+
+	vim.api.nvim_command("BufferLineCyclePrev")
+end
+
+-- 切换到上一次的标签页
+function bufswitch()
+    local_last_buffer = vim.fn.bufnr('%')
+    vim.cmd('buffer ' .. last_buffer)
+	last_buffer = local_last_buffer
+end
+
+
 if vim.fn.has('wsl') then
   vim.cmd [[
   augroup Yank
@@ -382,6 +419,10 @@ end
 
 function FileFmt()
 	local file_type = vim.bo.filetype
+	if file_type == "go" then
+		vim.api.nvim_exec([[GoImports]],true)
+		return
+	end
 	vim.api.nvim_exec([[call CocActionAsync('format')]],true)
 	vim.api.nvim_exec([[update]],true)
 end
@@ -469,13 +510,16 @@ require'nvim-treesitter.configs'.setup {
 
 -- Gitsigns
 require('gitsigns').setup {
-	signs = {
-		add = { hl = 'GitGutterAdd', text = '+' },
-		change = { hl = 'GitGutterChange', text = '~' },
-		delete = { hl = 'GitGutterDelete', text = '_' },
-		topdelete = { hl = 'GitGutterDelete', text = '‾' },
-		changedelete = { hl = 'GitGutterChange', text = '~' },
-		},
+	 signs = {
+	 	add = { hl = 'GitGutterAdd', text = '+' ,numhl='', linehl=''},
+	 	change = { hl = 'GitGutterChange', text = '~' ,numhl='', linehl=''},
+	 	delete = { hl = 'GitGutterDelete', text = '_' ,numhl='', linehl=''},
+	 	topdelete = { hl = 'GitGutterDelete', text = '‾' ,numhl='', linehl=''},
+	 	changedelete = { hl = 'GitGutterChange', text = '~' ,numhl='', linehl=''},
+	 	},
+	numhl = false, 
+	sign_priority = 6,
+
 	keymaps = {
 		-- Default keymap options
 		noremap = true,
@@ -503,7 +547,7 @@ require('gitsigns').setup {
 		follow_files = true
 		},
 	attach_to_untracked = true,
-	current_line_blame = false, -- Toggle with `:Gitsigns toggle_current_line_blame`
+	current_line_blame = true, -- Toggle with `:Gitsigns toggle_current_line_blame`
 	current_line_blame_opts = {
 		virt_text = true,
 		virt_text_pos = 'eol', -- 'eol' | 'overlay' | 'right_align'
@@ -528,8 +572,11 @@ require('gitsigns').setup {
 	yadm = {
 	enable = false
 	},
-linehl = true
+linehl = false
 }
+
+vim.o.signcolumn = 'yes'
+
 
 require('dap-go').setup()
 require('dap-python').setup('python')
@@ -541,18 +588,6 @@ dap.adapters.cppdbg = {
   command = '/home/soyum/extension/debugAdapters/bin/OpenDebugAD7',
 }
 
-require("dapui").setup()
-
-local dap, dapui = require("dap"), require("dapui")
-dap.listeners.after.event_initialized["dapui_config"] = function()
-  dapui.open()
-end
-dap.listeners.before.event_terminated["dapui_config"] = function()
-  dapui.close()
-end
-dap.listeners.before.event_exited["dapui_config"] = function()
-  dapui.close()
-end
 
 require("nvim-dap-virtual-text").setup {
     enabled = true,                     -- enable this plugin (the default)
@@ -593,6 +628,7 @@ dap.configurations.cpp = {
     end,
   },
 }
+
 
 
 
@@ -657,45 +693,124 @@ hooks.register(hooks.type.HIGHLIGHT_SETUP, function()
     vim.api.nvim_set_hl(0, "RainbowCyan", { fg = "#56B6C2" })
 end)
 
-require("ibl").setup { indent = { highlight = highlight } }
+-- require("ibl").setup { indent = { highlight = highlight } }
+-- just simple
+require("ibl").setup()
 
--- indentation
-local highlight = {
-    "RainbowRed",
-    "RainbowYellow",
-    "RainbowBlue",
-    "RainbowOrange",
-    "RainbowGreen",
-    "RainbowViolet",
-    "RainbowCyan",
-}
 
-local hooks = require "ibl.hooks"
--- create the highlight groups in the highlight setup hook, so they are reset
--- every time the colorscheme changes
-hooks.register(hooks.type.HIGHLIGHT_SETUP, function()
-    vim.api.nvim_set_hl(0, "RainbowRed", { fg = "#E06C75" })
-    vim.api.nvim_set_hl(0, "RainbowYellow", { fg = "#E5C07B" })
-    vim.api.nvim_set_hl(0, "RainbowBlue", { fg = "#61AFEF" })
-    vim.api.nvim_set_hl(0, "RainbowOrange", { fg = "#D19A66" })
-    vim.api.nvim_set_hl(0, "RainbowGreen", { fg = "#98C379" })
-    vim.api.nvim_set_hl(0, "RainbowViolet", { fg = "#C678DD" })
-    vim.api.nvim_set_hl(0, "RainbowCyan", { fg = "#56B6C2" })
-end)
-
-require("ibl").setup { indent = { highlight = highlight } }
+-- local hooks = require "ibl.hooks"
+-- -- create the highlight groups in the highlight setup hook, so they are reset
+-- -- every time the colorscheme changes
+-- hooks.register(hooks.type.HIGHLIGHT_SETUP, function()
+--     vim.api.nvim_set_hl(0, "RainbowRed", { fg = "#E06C75" })
+--     vim.api.nvim_set_hl(0, "RainbowYellow", { fg = "#E5C07B" })
+--     vim.api.nvim_set_hl(0, "RainbowBlue", { fg = "#61AFEF" })
+--     vim.api.nvim_set_hl(0, "RainbowOrange", { fg = "#D19A66" })
+--     vim.api.nvim_set_hl(0, "RainbowGreen", { fg = "#98C379" })
+--     vim.api.nvim_set_hl(0, "RainbowViolet", { fg = "#C678DD" })
+--     vim.api.nvim_set_hl(0, "RainbowCyan", { fg = "#56B6C2" })
+-- end)
+-- 
+-- require("ibl").setup { indent = { highlight = highlight } }
 
 -- init.lua
 
 -- following options are the default
 -- each of these are documented in `:help nvim-tree.OPTION_NAME`
 
+
+function get_files_in_tab(tabpage)
+    local files = {}
+    local windows = vim.api.nvim_tabpage_list_wins(tabpage)
+
+    for _, win in ipairs(windows) do
+        local buf = vim.api.nvim_win_get_buf(win)
+        local file_name = vim.api.nvim_buf_get_name(buf)
+
+	-- exclude buffers without names
+        if file_name ~= '' then
+            table.insert(files, file_name)
+        end
+    end
+
+    return files
+end
+
+-- get all files in all tabs
+function get_all_files_in_tabs()
+    local all_files = {}
+    local tabpages = vim.api.nvim_list_tabpages()
+
+    for _, tabpage in ipairs(tabpages) do
+        local files_in_tab = get_files_in_tab(tabpage)
+        all_files[tabpage] = files_in_tab
+    end
+
+    return all_files
+end
+
+
+function tree_open_file()
+
+	local file_path = require("nvim-tree.api").tree.get_node_under_cursor().absolute_path
+
+	local all_files = get_all_files_in_tabs()
+
+	for tabpage, files in pairs(all_files) do
+		for _, file in ipairs(files) do
+			if file == file_path then
+				vim.api.nvim_set_current_tabpage(tabpage)
+				return
+			end
+		end
+	end
+
+	require("nvim-tree.api").node.open.tab()
+end
+
+local function my_on_attach(bufnr)
+        -- custom mappings
+	local function opts(desc)
+      return { desc = "nvim-tree: " .. desc, buffer = bufnr, noremap = true, silent = true, nowait = true }
+    end
+		
+    local api = require "nvim-tree.api"
+    api.config.mappings.default_on_attach(bufnr)
+
+	vim.keymap.set('n', '<CR>', tree_open_file,         opts('Up'))
+	vim.keymap.set('n', '<C-t>', tree_open_file,        opts('Up'))
+
+end
+
 require'nvim-tree'.setup {
 	open_on_tab=true,
         auto_close=true,
        }
+	   
+vim.opt.termguicolors = true
+require("bufferline").setup{
+   options = {
+        hover = {
+            enabled = true,
+            delay = 200,
+            reveal = {'close'}
+        },
+		offsets = {
+        {
+            filetype = "NvimTree",
+            text = "File Explorer",
+            highlight = "Directory",
+            separator = true -- use a "true" to enable the default, or set your own character
+        }
+    }
+    }
+	}
 
 
+
+
+
+vim.api.nvim_set_keymap('n', '<Leader>t', ':lua SwitchToLastTab()<CR>', { noremap = true, silent = true })
 
 -- Auto save session
 require("persistence").setup {
