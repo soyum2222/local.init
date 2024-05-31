@@ -26,7 +26,7 @@ if [ "$input" == "y" ]; then
 	fi
 
 	wget https://github.com/microsoft/vscode-cpptools/releases/download/v1.20.5/cpptools-linux.vsix
-	unzip /opt/cpptools-linux.vsix 
+	unzip cpptools-linux.vsix 
 	mv extension /opt/
 	rm cpptools-linux.vsix
 
