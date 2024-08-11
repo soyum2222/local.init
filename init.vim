@@ -137,9 +137,14 @@ Plug 'mildred/vim-bufmru'
 
 Plug 'folke/tokyonight.nvim'
 
+Plug 'arsham/arshlib.nvim'
+Plug 'famiu/feline.nvim'
+Plug 'rebelot/heirline.nvim'
+Plug 'kyazdani42/nvim-web-devicons'
+Plug 'lewis6991/gitsigns.nvim'
+Plug 'arsham/arshamiser.nvim'
 
 call plug#end()
-
 
 
 " By default, it will be triggered by `ENTER` in insert mode.
@@ -360,6 +365,17 @@ lua << EOF
 
 vim.cmd[[colorscheme tokyonight]]
 
+vim.cmd [[highlight CocHighlightText ctermfg=white ctermbg=none guifg=#FFFFFF guibg=#3C3836]]
+ 
+vim.cmd.colorscheme("arshamiser_light")
+require("arshamiser.feliniser")
+    -- or:
+    -- require("arshamiser.heirliniser")
+
+_G.custom_foldtext = require("arshamiser.folding").foldtext
+vim.opt.foldtext = "v:lua.custom_foldtext()"
+    -- if you want to draw a tabline:
+vim.api.nvim_set_option("tabline", [[%{%v:lua.require("arshamiser.tabline").draw()%}]])
 
 last_tab = vim.api.nvim_get_current_tabpage()
 
@@ -695,7 +711,7 @@ end)
 
 -- require("ibl").setup { indent = { highlight = highlight } }
 -- just simple
-require("ibl").setup()
+-- require("ibl").setup()
 
 
 -- local hooks = require "ibl.hooks"
