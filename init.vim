@@ -23,7 +23,8 @@ noremap <leader><tab> :lua bufswitch()<CR>
 
 noremap <leader>b :lua require'dap'.toggle_breakpoint()<CR>
 noremap <leader>c :lua DapDebug()<CR>
-noremap <leader>s :lua require('dap.ui.widgets').hover()<CR>
+noremap <leader>d :lua require("dapui").toggle()<CR>
+noremap <leader>s :lua require("dapui").eval()<CR>
 noremap <leader>w :lua local widgets =  require('dap.ui.widgets'); widgets.centered_float(widgets.scopes)<CR>
 noremap <leader>g :G<CR>
 noremap <leader>im :lua require'telescope'.extensions.goimpl.goimpl{}<CR>
@@ -106,6 +107,7 @@ Plug 'leoluz/nvim-dap-go'
 Plug 'mfussenegger/nvim-dap-python'
 Plug 'rcarriga/nvim-dap-ui'
 Plug 'theHamsta/nvim-dap-virtual-text'
+Plug 'nvim-neotest/nvim-nio'
 
 " go plug
 Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
@@ -604,6 +606,8 @@ dap.adapters.cppdbg = {
   command = '~/extension/debugAdapters/bin/OpenDebugAD7',
 }
 
+require("dapui").setup()
+
 
 require("nvim-dap-virtual-text").setup {
     enabled = true,                     -- enable this plugin (the default)
@@ -619,6 +623,20 @@ require("nvim-dap-virtual-text").setup {
     virt_text_win_col = nil             -- position the virtual text at a fixed window column (starting from the first text column) ,
                                         -- e.g. 80 to position at column 80, see `:h nvim_buf_set_extmark()`
 }
+
+local dap, dapui = require("dap"), require("dapui")
+dap.listeners.before.attach.dapui_config = function()
+  dapui.open()
+end
+dap.listeners.before.launch.dapui_config = function()
+  dapui.open()
+end
+dap.listeners.before.event_terminated.dapui_config = function()
+  dapui.close()
+end
+dap.listeners.before.event_exited.dapui_config = function()
+  dapui.close()
+end
 
 dap.configurations.cpp = {
   {
