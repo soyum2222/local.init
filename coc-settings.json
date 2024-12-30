@@ -1,7 +1,7 @@
 {
-  "snippets.ultisnips.pythonPrompt": false,
-  "pyright.inlayHints.variableTypes": false,
-  "pyright.inlayHints.parameterTypes": false,
-  "pyright.inlayHints.functionReturnTypes": false
-
+	"snippets.ultisnips.pythonPrompt": false,
+	"pyright.inlayHints.variableTypes": false,
+	"pyright.inlayHints.parameterTypes": false,
+	"pyright.inlayHints.functionReturnTypes": false,
+	"coc.preferences.confirmKey": "enter"
 }

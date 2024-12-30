@@ -120,7 +120,7 @@ Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}  " We recommend upda
 Plug 'preservim/nerdcommenter'
 
 " indentation
-Plug 'lukas-reineke/indent-blankline.nvim'
+" Plug 'lukas-reineke/indent-blankline.nvim'
 
 
 " For vsnip users.
@@ -528,38 +528,17 @@ require'nvim-treesitter.configs'.setup {
 
 -- Gitsigns
 require('gitsigns').setup {
-	 signs = {
-	 	add = { hl = 'GitGutterAdd', text = '+' },
-	 	change = { hl = 'GitGutterChange', text = '~' },
-	 	delete = { hl = 'GitGutterDelete', text = '_' },
-	 	topdelete = { hl = 'GitGutterDelete', text = '‾' },
-	 	changedelete = { hl = 'GitGutterChange', text = '~' },
-	 	},
+	 -- signs = {
+	 -- 	add = { hl = 'GitGutterAdd', text = '+' },
+	 -- 	change = { hl = 'GitGutterChange', text = '~' },
+	 -- 	delete = { hl = 'GitGutterDelete', text = '_' },
+	 -- 	topdelete = { hl = 'GitGutterDelete', text = '‾' },
+	 -- 	changedelete = { hl = 'GitGutterChange', text = '~' },
+	 -- 	},
 	numhl = true, 
 	sign_priority = 6,
 
-	keymaps = {
-		-- Default keymap options
-		noremap = true,
-
-		['n ]h'] = { expr = true, "&diff ? ']c' : '<cmd>lua require\"gitsigns.actions\".next_hunk()<CR>'"},
-		['n [h'] = { expr = true, "&diff ? '[c' : '<cmd>lua require\"gitsigns.actions\".prev_hunk()<CR>'"},
-
-		['n <leader>hs'] = '<cmd>lua require"gitsigns".stage_hunk()<CR>',
-		['v <leader>hs'] = '<cmd>lua require"gitsigns".stage_hunk({vim.fn.line("."), vim.fn.line("v")})<CR>',
-		['n <leader>hu'] = '<cmd>lua require"gitsigns".undo_stage_hunk()<CR>',
-		['n <leader>hr'] = '<cmd>lua require"gitsigns".reset_hunk()<CR>',
-		['v <leader>hr'] = '<cmd>lua require"gitsigns".reset_hunk({vim.fn.line("."), vim.fn.line("v")})<CR>',
-		--['n <leader>hR'] = '<cmd>lua require"gitsigns".reset_buffer()<CR>',
-		--['n <leader>hp'] = '<cmd>lua require"gitsigns".preview_hunk()<CR>',
-		['n <leader>hb'] = '<cmd>lua require"gitsigns".blame_line(true)<CR>',
-		--['n <leader>hS'] = '<cmd>lua require"gitsigns".stage_buffer()<CR>',
-		--['n <leader>hU'] = '<cmd>lua require"gitsigns".reset_buffer_index()<CR>',
-
-		-- Text objects
-		['o ih'] = ':<C-U>lua require"gitsigns.actions".select_hunk()<CR>',
-		['x ih'] = ':<C-U>lua require"gitsigns.actions".select_hunk()<CR>'
-		},
+	
 	watch_gitdir = {
 		interval = 1000,
 		follow_files = true
@@ -571,9 +550,6 @@ require('gitsigns').setup {
 		virt_text_pos = 'eol', -- 'eol' | 'overlay' | 'right_align'
 		delay = 100,
 		ignore_whitespace = false,
-		},
-	current_line_blame_formatter_opts = {
-		relative_time = false
 		},
 	sign_priority = 6,
 	update_debounce = 100,
@@ -587,9 +563,7 @@ require('gitsigns').setup {
 		row = 0,
 		col = 1
 		},
-	yadm = {
-	enable = false
-	},
+	
 linehl = true 
 }
 
@@ -703,29 +677,20 @@ require("auto-save").setup {
 }
 
 -- indentation
-local highlight = {
-    "RainbowRed",
-    "RainbowYellow",
-    "RainbowBlue",
-    "RainbowOrange",
-    "RainbowGreen",
-    "RainbowViolet",
-    "RainbowCyan",
-}
+
 -- vim.api.nvim_set_keymap("n", "<leader>n", ":ASToggle<CR>", {})
 
-local hooks = require "ibl.hooks"
 -- create the highlight groups in the highlight setup hook, so they are reset
 -- every time the colorscheme changes
-hooks.register(hooks.type.HIGHLIGHT_SETUP, function()
-    vim.api.nvim_set_hl(0, "RainbowRed", { fg = "#E06C75" })
-    vim.api.nvim_set_hl(0, "RainbowYellow", { fg = "#E5C07B" })
-    vim.api.nvim_set_hl(0, "RainbowBlue", { fg = "#61AFEF" })
-    vim.api.nvim_set_hl(0, "RainbowOrange", { fg = "#D19A66" })
-    vim.api.nvim_set_hl(0, "RainbowGreen", { fg = "#98C379" })
-    vim.api.nvim_set_hl(0, "RainbowViolet", { fg = "#C678DD" })
-    vim.api.nvim_set_hl(0, "RainbowCyan", { fg = "#56B6C2" })
-end)
+-- hooks.register(hooks.type.HIGHLIGHT_SETUP, function()
+--     vim.api.nvim_set_hl(0, "RainbowRed", { fg = "#E06C75" })
+--     vim.api.nvim_set_hl(0, "RainbowYellow", { fg = "#E5C07B" })
+--     vim.api.nvim_set_hl(0, "RainbowBlue", { fg = "#61AFEF" })
+--     vim.api.nvim_set_hl(0, "RainbowOrange", { fg = "#D19A66" })
+--     vim.api.nvim_set_hl(0, "RainbowGreen", { fg = "#98C379" })
+--     vim.api.nvim_set_hl(0, "RainbowViolet", { fg = "#C678DD" })
+--     vim.api.nvim_set_hl(0, "RainbowCyan", { fg = "#56B6C2" })
+-- end)
 
 -- require("ibl").setup { indent = { highlight = highlight } }
 -- just simple
@@ -818,8 +783,9 @@ end
 
 require'nvim-tree'.setup {
 	open_on_tab=true,
-        auto_close=true,
+        -- auto_close=true,
        }
+
 	   
 vim.opt.termguicolors = true
 require("bufferline").setup{
