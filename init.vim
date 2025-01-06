@@ -589,7 +589,7 @@ local dap = require('dap')
 dap.adapters.cppdbg = {
   id = 'cppdbg',
   type = 'executable',
-  command = '~/extension/debugAdapters/bin/OpenDebugAD7',
+  command = '/opt/nvim-cpptools/extension/debugAdapters/bin/OpenDebugAD7',
 }
 
 require("dapui").setup()
