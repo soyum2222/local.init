@@ -6,6 +6,10 @@ set mouse=a
 set fileencodings=utf-8,gbk
 set ff=unix
 
+set completeopt-=preview
+set completeopt-=menu
+
+
 noremap <F2> :NvimTreeToggle<CR>
 noremap <F7> :lua require'dap'.step_into()<CR>
 noremap <F8> :lua require'dap'.step_over()<CR>
@@ -18,8 +22,8 @@ noremap <leader>- :lua tabprev()<CR>
 noremap <leader>= :lua tabnext()<CR>
 noremap <A--> :lua bufprev()<CR>
 noremap <A-=> :lua bufnext()<CR>
-noremap ≠ :lua bufprev()<CR>
-noremap – :lua bufnext()<CR>
+noremap ≠ :lua bufnext()<CR>
+noremap – :lua bufprev()<CR>
 
 
 noremap <leader><tab> :lua bufswitch()<CR>
@@ -33,7 +37,9 @@ noremap <leader>w :lua local widgets =  require('dap.ui.widgets'); widgets.cente
 noremap <leader>g :G<CR>
 noremap <leader>im :lua require'telescope'.extensions.goimpl.goimpl{}<CR>
 nnoremap <C-d> 15j
+vnoremap <C-d> 15j
 nnoremap <C-u> 15k
+vnoremap <C-u> 15k
 
 
 nmap <leader><F6> <Plug>(coc-rename)
@@ -102,8 +108,10 @@ Plug 'tpope/vim-fugitive'
 " Plug 'airblade/vim-gitgutter'
 Plug 'nvim-lua/plenary.nvim'
 Plug 'lewis6991/gitsigns.nvim'
-"Plug 'f-person/git-blame.nvim'
-
+" Plug 'NeogitOrg/neogit'
+Plug 'sindrets/diffview.nvim'
+Plug 'FabijanZulj/blame.nvim'
+Plug 'rbong/vim-flog'
 
 " async run
 Plug 'skywind3000/asyncrun.vim'
@@ -164,10 +172,18 @@ Plug 'junegunn/fzf.vim'
 
 Plug 'akinsho/toggleterm.nvim', {'tag' : '*'}
 
+
+Plug 'kevinhwang91/nvim-ufo'
+Plug 'kevinhwang91/promise-async'
+
+" ui plug
+Plug 'MunifTanjim/nui.nvim'
+
 call plug#end()
 
 set termguicolors
-colorscheme dracula
+"colorscheme dracula
+colorscheme tokyonight
 
 
 
@@ -394,9 +410,37 @@ nnoremap <silent><nowait> <space>p  :<C-u>CocListResume<CR>
 
 lua << EOF
 
+
+require('blame').setup {}
+
+local Menu = require("nui.menu")
+local event = require("nui.utils.autocmd").event
+
+
+
+vim.g.neovide_input_use_logo = 1
+vim.api.nvim_set_keymap('', '<D-v>', '+p<CR>', { noremap = true, silent = true})
+vim.api.nvim_set_keymap('!', '<D-v>', '<C-R>+', { noremap = true, silent = true})
+vim.api.nvim_set_keymap('t', '<D-v>', '<C-R>+', { noremap = true, silent = true})
+vim.api.nvim_set_keymap('v', '<D-v>', '<C-R>+', { noremap = true, silent = true})
+
+vim.o.foldcolumn = '1' -- '0' is not bad
+vim.o.foldlevel = 99 -- Using ufo provider need a large value, feel free to decrease the value
+vim.o.foldlevelstart = 99
+vim.o.foldenable = true
+
+-- Using ufo provider need remap `zR` and `zM`. If Neovim is 0.6.1, remap yourself
+vim.keymap.set('n', 'zR', require('ufo').openAllFolds)
+vim.keymap.set('n', 'zM', require('ufo').closeAllFolds)
+
+require('ufo').setup()
+
+
+
 require("toggleterm").setup{
-        open_mapping = [[<c-t>]],
+        open_mapping = [[†]],
 }
+
 
 -- vim.cmd[[colorscheme tokyonight]]
 -- vim.cmd.colorscheme("arshamiser_light")
@@ -467,6 +511,79 @@ if vim.fn.has('wsl') then
   augroup END
   ]]
 end
+
+
+local git_menu = Menu({
+  position = "100%",
+  size = {
+    width = 50,
+    height = 50,
+  },
+  border = {
+    style = "single",
+    text = {
+      top = "[Git Menu]",
+      top_align = "center",
+    },
+  },
+  win_options = {
+    winhighlight = "Normal:Normal,FloatBorder:Normal",
+  },
+}, {
+  lines = {
+    Menu.item("Git blame"),
+    Menu.item("Git diffview file history"),
+    Menu.item("Git log"),
+    Menu.item("cancel"),
+  },
+  max_width = 20,
+  keymap = {
+    focus_next = { "j", "<Down>", "<Tab>" },
+    focus_prev = { "k", "<Up>", "<S-Tab>" },
+    close = { "<Esc>", "<C-c>" },
+    submit = { "<CR>", "<Space>" },
+  },
+  on_close = function()
+    print("Menu Closed!")
+  end,
+  on_submit = function(item)
+
+    if item.text == "Git blame" then
+      vim.cmd("BlameToggle")
+    end
+
+    if item.text == "Git diffview file history" then
+      vim.cmd("DiffviewFileHistory %")
+    end
+
+    if item.text == "Git log" then
+      vim.cmd("Flog")
+    end
+
+    print("Menu Submitted: ", item.text)
+  end,
+})
+
+-- mount the component
+
+
+
+function GitUi()
+        git_menu:mount()
+end
+
+vim.api.nvim_create_user_command(
+    'Ui',
+    function(opts)
+        local arg = opts.args
+        if arg == "git" then
+                GitUi()
+        end
+
+    end,
+    { nargs = 1, desc = "Open Git UI with an argument" }
+)
+
 
 function FileFmt()
         local file_type = vim.bo.filetype
@@ -559,15 +676,17 @@ require'nvim-treesitter.configs'.setup {
                 },
 }
 
+vim.api.nvim_set_hl(0,'GitSignsAdd',{link='GitGutterAdd'})
+
 -- Gitsigns
 require('gitsigns').setup {
-          signs = {
-                add = { hl = 'GitGutterAdd', text = '+' },
-                change = { hl = 'GitGutterChange', text = '*' },
-                delete = { hl = 'GitGutterDelete', text = '-' },
-                topdelete = { hl = 'GitGutterDelete', text = '‾' },
-                changedelete = { hl = 'GitGutterChange', text = '~' },
-                },
+        --  signs = {
+        --  signs       add = { hl = 'GitGutterAdd', text = '+' },
+        --  signs       change = { hl = 'GitGutterChange', text = '*' },
+        --  signs       delete = { hl = 'GitGutterDelete', text = '-' },
+        --  signs       topdelete = { hl = 'GitGutterDelete', text = '‾' },
+        --  signs       changedelete = { hl = 'GitGutterChange', text = '~' },
+        --  signs       },
         numhl = true,
         sign_priority = 6,
 
