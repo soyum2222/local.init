@@ -424,6 +424,12 @@ vim.api.nvim_set_keymap('!', '<D-v>', '<C-R>+', { noremap = true, silent = true}
 vim.api.nvim_set_keymap('t', '<D-v>', '<C-R>+', { noremap = true, silent = true})
 vim.api.nvim_set_keymap('v', '<D-v>', '<C-R>+', { noremap = true, silent = true})
 
+
+vim.api.nvim_set_keymap('', '<S-Insert>', '+p<CR>', { noremap = true, silent = true})
+vim.api.nvim_set_keymap('!', '<S-Insert>', '<C-R>+', { noremap = true, silent = true})
+vim.api.nvim_set_keymap('t', '<S-Insert>', '<C-R>+', { noremap = true, silent = true})
+vim.api.nvim_set_keymap('v', '<S-Insert>', '<C-R>+', { noremap = true, silent = true})
+
 vim.o.foldcolumn = '1' -- '0' is not bad
 vim.o.foldlevel = 99 -- Using ufo provider need a large value, feel free to decrease the value
 vim.o.foldlevelstart = 99
@@ -726,6 +732,11 @@ require('dap-go').setup()
 require('dap-python').setup('python')
 
 local dap = require('dap')
+
+vim.fn.sign_define('DapBreakpoint', {text='🛑', texthl='', linehl='', numhl=''})
+vim.fn.sign_define('DapStopped', {text='➡️', texthl='', linehl='', numhl=''})
+
+
 dap.adapters.cppdbg = {
   id = 'cppdbg',
   type = 'executable',

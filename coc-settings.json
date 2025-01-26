@@ -3,8 +3,21 @@
         "pyright.inlayHints.variableTypes": false,
         "pyright.inlayHints.parameterTypes": false,
         "pyright.inlayHints.functionReturnTypes": false,
-        "coc.preferences.confirmKey": "enter",
         "go.goplsOptions": {
                 "expandWorkspaceToModule": true
-        }
-}
+        },
+	"python.analysis.diagnosticSeverityOverrides": {
+		    "reportOperatorIssue": "none"
+		      
+
+
+
+
+
+
+
+
+
+
+
+}}
