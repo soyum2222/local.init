@@ -1,23 +1,20 @@
 {
-        "snippets.ultisnips.pythonPrompt": false,
-        "pyright.inlayHints.variableTypes": false,
-        "pyright.inlayHints.parameterTypes": false,
-        "pyright.inlayHints.functionReturnTypes": false,
-        "go.goplsOptions": {
-                "expandWorkspaceToModule": true
-        },
+	"snippets.ultisnips.pythonPrompt": false,
+	"pyright.inlayHints.variableTypes": false,
+	"pyright.inlayHints.parameterTypes": false,
+	"pyright.inlayHints.functionReturnTypes": false,
+	"go.goplsOptions": {
+		"expandWorkspaceToModule": true
+	},
 	"python.analysis.diagnosticSeverityOverrides": {
-		    "reportOperatorIssue": "none"
-		      
-
-
-
-
-
-
-
-
-
-
-
-}}
+		"reportOperatorIssue": "none"
+	},
+	"languageserver": {
+		"lua": {
+			"command": "lua-lsp",
+			"filetypes": [
+				"lua"
+			]
+		}
+	}
+}
