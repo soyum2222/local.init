@@ -61,13 +61,19 @@ return
 	{
 
 		"sindrets/diffview.nvim",
+	},
+	{
 		"rbong/vim-flog",
-		"FabijanZulj/blame.nvim",
+	},
 
+	{
+		"FabijanZulj/blame.nvim",
 		config = function()
 			require('blame').setup {}
 		end,
+	},
+	{
 
-	}
-
+		'tpope/vim-fugitive',
+	},
 }
