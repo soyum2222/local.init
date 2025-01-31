@@ -66,7 +66,7 @@ vim.cmd([[ noremap <leader>d :lua require("dapui").toggle()<CR>]])
 vim.cmd([[ noremap <leader>s :lua require("dapui").eval()<CR>]])
 
 vim.cmd(
-[[ noremap <leader>w :lua local widgets =  require('dap.ui.widgets'); widgets.centered_float(widgets.scopes)<CR>]])
+	[[ noremap <leader>w :lua local widgets =  require('dap.ui.widgets'); widgets.centered_float(widgets.scopes)<CR>]])
 
 vim.cmd([[ noremap <leader>g :G<CR>]])
 
@@ -111,7 +111,7 @@ vim.cmd([[noremap  :tabn<CR>]])
 
 
 vim.cmd(
-[[command DebugW lua local widgets = require('dap.ui.widgets');local my_sidebar = widgets.sidebar(widgets.scopes);my_sidebar.open();local widgets = require('dap.ui.widgets');local my_sidebar = widgets.sidebar(widgets.frames);my_sidebar.open();]])
+	[[command DebugW lua local widgets = require('dap.ui.widgets');local my_sidebar = widgets.sidebar(widgets.scopes);my_sidebar.open();local widgets = require('dap.ui.widgets');local my_sidebar = widgets.sidebar(widgets.frames);my_sidebar.open();]])
 
 
 vim.g.neovide_input_use_logo = 1
@@ -177,3 +177,71 @@ function FileFmt()
 	vim.api.nvim_exec([[call CocActionAsync('format')]], true)
 	vim.api.nvim_exec([[update]], true)
 end
+
+local Menu = require("nui.menu")
+
+local git_menu = Menu({
+	position = "50%",
+	size = {
+		width = 50,
+		height = 20,
+	},
+	border = {
+		style = "single",
+		text = {
+			top = "[Git Menu]",
+			top_align = "center",
+		},
+	},
+	win_options = {
+		winhighlight = "Normal:Normal,FloatBorder:Normal",
+	},
+}, {
+	lines = {
+		Menu.item("Git blame"),
+		Menu.item("Git diffview file history"),
+		Menu.item("Git log"),
+		Menu.item("cancel"),
+	},
+	max_width = 20,
+	keymap = {
+		focus_next = { "j", "<Down>", "<Tab>" },
+		focus_prev = { "k", "<Up>", "<S-Tab>" },
+		close = { "<Esc>", "<C-c>" },
+		submit = { "<CR>", "<Space>" },
+	},
+	on_close = function()
+		print("Menu Closed!")
+	end,
+	on_submit = function(item)
+		if item.text == "Git blame" then
+			vim.cmd("BlameToggle")
+		end
+
+		if item.text == "Git diffview file history" then
+			vim.cmd("DiffviewFileHistory %")
+		end
+
+		if item.text == "Git log" then
+			vim.cmd("Flog")
+		end
+
+		print("Menu Submitted: ", item.text)
+	end,
+})
+
+
+function GitUi()
+	git_menu:mount()
+end
+
+vim.api.nvim_create_user_command(
+	'Ui',
+	function(opts)
+		local arg = opts.args
+		if arg == "git" then
+			GitUi()
+		end
+	end,
+	{ nargs = 1, desc = "Open Git UI with an argument" }
+)
