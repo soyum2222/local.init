@@ -66,7 +66,7 @@ vim.cmd([[ noremap <leader>d :lua require("dapui").toggle()<CR>]])
 vim.cmd([[ noremap <leader>s :lua require("dapui").eval()<CR>]])
 
 vim.cmd(
-	[[ noremap <leader>w :lua local widgets =  require('dap.ui.widgets'); widgets.centered_float(widgets.scopes)<CR>]])
+[[ noremap <leader>w :lua local widgets =  require('dap.ui.widgets'); widgets.centered_float(widgets.scopes)<CR>]])
 
 vim.cmd([[ noremap <leader>g :G<CR>]])
 
@@ -77,9 +77,9 @@ vim.cmd([[ nnoremap <C-u> 15k]])
 vim.cmd([[ vnoremap <C-u> 15k]])
 
 
-vim.cmd([[ nmap <leader><F6> <Plug>(coc-rename)]])
+-- vim.cmd([[ nmap <leader><F6> <Plug>(coc-rename)]])
 vim.cmd([[noremap <leader>q :q!<cr>]])
-vim.cmd([[noremap <C-s> :lua FileFmt()<CR>]])
+vim.cmd([[noremap <C-s> :lua vim.lsp.buf.format({ async = true })<CR>]])
 vim.cmd([[imap <C-s> <cmd>lua FileFmt()<CR>]])
 
 vim.cmd([[noremap <C-r> :%s/]])
@@ -111,7 +111,7 @@ vim.cmd([[noremap  :tabn<CR>]])
 
 
 vim.cmd(
-	[[command DebugW lua local widgets = require('dap.ui.widgets');local my_sidebar = widgets.sidebar(widgets.scopes);my_sidebar.open();local widgets = require('dap.ui.widgets');local my_sidebar = widgets.sidebar(widgets.frames);my_sidebar.open();]])
+[[command DebugW lua local widgets = require('dap.ui.widgets');local my_sidebar = widgets.sidebar(widgets.scopes);my_sidebar.open();local widgets = require('dap.ui.widgets');local my_sidebar = widgets.sidebar(widgets.frames);my_sidebar.open();]])
 
 
 vim.g.neovide_input_use_logo = 1
@@ -128,120 +128,54 @@ vim.api.nvim_set_keymap('v', '<S-Insert>', '<C-R>+', { noremap = true, silent = 
 
 
 function tabnew()
-	last_tab = vim.api.nvim_get_current_tabpage()
-	vim.api.nvim_command("tabnew")
+        last_tab = vim.api.nvim_get_current_tabpage()
+        vim.api.nvim_command("tabnew")
 end
 
 function tabnext()
-	last_tab = vim.api.nvim_get_current_tabpage()
-	vim.api.nvim_command("tabnext")
+        last_tab = vim.api.nvim_get_current_tabpage()
+        vim.api.nvim_command("tabnext")
 end
 
 function tabprev()
-	last_tab = vim.api.nvim_get_current_tabpage()
-	vim.api.nvim_command("tabprev")
+        last_tab = vim.api.nvim_get_current_tabpage()
+        vim.api.nvim_command("tabprev")
 end
 
 function tabswitch()
-	local_last_tab = vim.api.nvim_get_current_tabpage()
-	vim.api.nvim_set_current_tabpage(last_tab)
-	last_tab = local_last_tab
+        local_last_tab = vim.api.nvim_get_current_tabpage()
+        vim.api.nvim_set_current_tabpage(last_tab)
+        last_tab = local_last_tab
 end
 
 function bufnext()
-	last_buffer = vim.fn.bufnr('%')
-	print(last_buffer)
-	vim.api.nvim_command("BufferNext")
+        last_buffer = vim.fn.bufnr('%')
+        print(last_buffer)
+        vim.api.nvim_command("BufferNext")
 end
 
 function bufprev()
-	last_buffer = vim.fn.bufnr('%')
-	print(last_buffer)
+        last_buffer = vim.fn.bufnr('%')
+        print(last_buffer)
 
-	vim.api.nvim_command("BufferPrevious")
+        vim.api.nvim_command("BufferPrevious")
 end
 
 -- 切换到上一次的标签页
 function bufswitch()
-	local_last_buffer = vim.fn.bufnr('%')
-	vim.cmd('buffer ' .. last_buffer)
-	last_buffer = local_last_buffer
+        local_last_buffer = vim.fn.bufnr('%')
+        vim.cmd('buffer ' .. last_buffer)
+        last_buffer = local_last_buffer
 end
 
 function FileFmt()
-	local file_type = vim.bo.filetype
-	if file_type == "go" then
-		require("go.format").goimports()
-		return
-	end
-	vim.api.nvim_exec([[call CocActionAsync('format')]], true)
-	vim.api.nvim_exec([[update]], true)
+        local file_type = vim.bo.filetype
+        if file_type == "go" then
+                require("go.format").goimports()
+                return
+        end
+
+	vim.lsp.buf.format({ async = true })
+        --vim.api.nvim_exec([[call CocActionAsync('format')]], true)
+        --vim.api.nvim_exec([[update]], true)
 end
-
-local Menu = require("nui.menu")
-
-local git_menu = Menu({
-	position = "50%",
-	size = {
-		width = 50,
-		height = 20,
-	},
-	border = {
-		style = "single",
-		text = {
-			top = "[Git Menu]",
-			top_align = "center",
-		},
-	},
-	win_options = {
-		winhighlight = "Normal:Normal,FloatBorder:Normal",
-	},
-}, {
-	lines = {
-		Menu.item("Git blame"),
-		Menu.item("Git diffview file history"),
-		Menu.item("Git log"),
-		Menu.item("cancel"),
-	},
-	max_width = 20,
-	keymap = {
-		focus_next = { "j", "<Down>", "<Tab>" },
-		focus_prev = { "k", "<Up>", "<S-Tab>" },
-		close = { "<Esc>", "<C-c>" },
-		submit = { "<CR>", "<Space>" },
-	},
-	on_close = function()
-		print("Menu Closed!")
-	end,
-	on_submit = function(item)
-		if item.text == "Git blame" then
-			vim.cmd("BlameToggle")
-		end
-
-		if item.text == "Git diffview file history" then
-			vim.cmd("DiffviewFileHistory %")
-		end
-
-		if item.text == "Git log" then
-			vim.cmd("Flog")
-		end
-
-		print("Menu Submitted: ", item.text)
-	end,
-})
-
-
-function GitUi()
-	git_menu:mount()
-end
-
-vim.api.nvim_create_user_command(
-	'Ui',
-	function(opts)
-		local arg = opts.args
-		if arg == "git" then
-			GitUi()
-		end
-	end,
-	{ nargs = 1, desc = "Open Git UI with an argument" }
-)
