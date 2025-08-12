@@ -1,5 +1,4 @@
-#/bin/bash
-#
+#!/bin/bash
 echo "do you want install neovim ? (y/n)"
 read -n 1 -p "input: " input
 if [ "$input" == "y" ]; then

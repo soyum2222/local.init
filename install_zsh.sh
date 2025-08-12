@@ -1,6 +1,13 @@
-#/bin/bash
+#!/bin/bash
 apt install -y zsh
 chsh -s /bin/zsh
+
+
+OHMYZSH_HOME=$HOME/.oh-my-zsh
+
+GITHUB_URL=https://github.com
+
+WORKPATH=$(pwd)
 
 if [ ! -d "$OHMYZSH_HOME" ];then
 	git clone --depth=1 $GITHUB_URL/ohmyzsh/ohmyzsh.git ~/.oh-my-zsh
