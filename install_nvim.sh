@@ -4,9 +4,9 @@ read -n 1 -p "input: " input
 if [ "$input" == "y" ]; then
 	type nvim > /dev/null
 	if [ $? -ne 0 ] ;then 
-		add-apt-repository ppa:neovim-ppa/unstable
-		apt update
-		apt install -y neovim
+		sudo add-apt-repository ppa:neovim-ppa/unstable
+		sudo apt update
+		sudo apt install -y neovim
 	fi
 
 	wget https://github.com/microsoft/vscode-cpptools/releases/download/v1.20.5/cpptools-linux.vsix

@@ -1,6 +1,6 @@
 #!/bin/bash
-apt install -y zsh
-chsh -s /bin/zsh
+sudo apt install -y zsh
+sudo chsh -s /bin/zsh
 
 
 OHMYZSH_HOME=$HOME/.oh-my-zsh
