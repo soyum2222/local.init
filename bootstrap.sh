@@ -12,4 +12,4 @@ GITHUB_URL=https://github.com
 
 ./install_golang.sh
 
-./install_nodejs.sh
+#./install_nodejs.sh
